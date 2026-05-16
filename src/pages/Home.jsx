@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FaGithub, FaLinkedin, FaArrowRight, FaWhatsapp, FaEnvelope, FaDownload, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaArrowRight, FaWhatsapp, FaEnvelope, FaDownload, FaMapMarkerAlt, FaUser } from 'react-icons/fa';
 import * as FramerMotion from 'framer-motion';
 import { getTechIcon } from '../constants/iconMap';
 import { useTranslation } from '../i18n';
@@ -14,7 +14,7 @@ import {
 import FloatingActions from '../components/FloatingActions';
 
 const defaultProfile = {
-  full_name: 'Votre Nom',
+  full_name: 'Guy Wilfrid Tchouta',
   age: null,
   professional_title: 'Développeur Full Stack',
   location: null,
@@ -234,10 +234,17 @@ export default function Home() {
         </div>
         <div className="hero-avatar">
           <div className="avatar-ring"></div>
-          <img
-            src={profile.avatar_url || 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=720&q=80'}
-            alt={`Portrait de ${profile.full_name}`}
-          />
+          {profile.avatar_url ? (
+            <img
+              src={profile.avatar_url}
+              alt={`Portrait de ${profile.full_name}`}
+            />
+          ) : (
+            <div className="hero-avatar-placeholder" aria-label={`Portrait de ${profile.full_name}`}>
+              <FaUser />
+              <span>{profile.full_name}</span>
+            </div>
+          )}
         </div>
       </Motion.header>
 

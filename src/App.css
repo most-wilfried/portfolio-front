@@ -259,6 +259,35 @@
   box-shadow: var(--shadow);
 }
 
+.hero-avatar-placeholder {
+  width: 100%;
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1.8rem;
+  background:
+    radial-gradient(circle at 28% 20%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 34%),
+    linear-gradient(145deg, var(--surface-solid), color-mix(in srgb, var(--surface-solid) 78%, var(--accent-3) 18%));
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.hero-avatar-placeholder svg {
+  width: 5rem;
+  height: 5rem;
+  color: var(--accent);
+}
+
+.hero-avatar-placeholder span {
+  max-width: 18rem;
+  color: var(--muted);
+  font-weight: 800;
+  text-align: center;
+}
+
 .section {
   padding: 3.5rem 0;
 }
