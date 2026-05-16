@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:laravel": "vite build && rm -rf ../portfolio/public/frontend && mkdir -p ../portfolio/public/frontend && cp -R dist/. ../portfolio/public/frontend/",
     "lint": "eslint .",
     "preview": "vite preview"
   },

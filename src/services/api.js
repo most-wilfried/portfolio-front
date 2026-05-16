@@ -1,8 +1,9 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api';
-const LOCAL_API_FALLBACKS = ['http://127.0.0.1:8000/api', 'http://127.0.0.1:8001/api'];
+const API_BASE = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '/api' : 'http://127.0.0.1:8000/api');
+const LOCAL_API_FALLBACKS = import.meta.env.PROD ? ['/api'] : ['http://127.0.0.1:8000/api', 'http://127.0.0.1:8001/api'];
 
 function getApiBases() {
-  return [...new Set([localStorage.getItem('portfolio_api_base'), API_BASE, ...LOCAL_API_FALLBACKS].filter(Boolean))];
+  const storedBase = import.meta.env.PROD ? null : localStorage.getItem('portfolio_api_base');
+  return [...new Set([storedBase, API_BASE, ...LOCAL_API_FALLBACKS].filter(Boolean))];
 }
 
 function authHeaders() {
