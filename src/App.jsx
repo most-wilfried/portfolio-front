@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { FaGlobe, FaMoon, FaSun } from 'react-icons/fa';
+import { FaBars, FaGlobe, FaMoon, FaSun, FaTimes } from 'react-icons/fa';
 import Home from './pages/Home';
 import AdminDashboard from './pages/AdminDashboard';
 import { LanguageProvider, useTranslation } from './i18n';
@@ -27,9 +27,11 @@ function getInitialTheme() {
 
 function Navigation({ theme, onToggleTheme }) {
   const { language, t, toggleLanguage } = useTranslation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleNavClick = (event, path) => {
     if (!path.startsWith('/#')) {
+      setMenuOpen(false);
       return;
     }
 
@@ -37,11 +39,21 @@ function Navigation({ theme, onToggleTheme }) {
     const target = document.querySelector(path.replace('/', ''));
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     window.history.replaceState(null, '', path);
+    setMenuOpen(false);
   };
 
   return (
-    <header className="app-header">
+    <header className={menuOpen ? 'app-header menu-open' : 'app-header'}>
       <div className="brand">{t('brand')}</div>
+      <button
+        className="menu-toggle"
+        type="button"
+        onClick={() => setMenuOpen((value) => !value)}
+        aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+        aria-expanded={menuOpen}
+      >
+        {menuOpen ? <FaTimes /> : <FaBars />}
+      </button>
       <nav className="main-nav">
         {NAV_LINKS.map((link) => (
           <a

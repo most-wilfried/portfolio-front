@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaSave, FaSignOutAlt, FaPlus, FaTrash, FaEye, FaEyeSlash } from 'react-icons/fa';
 import {
   clearAuthToken,
@@ -17,6 +17,7 @@ import {
   updateProfile,
   updateResource,
   setAuthToken,
+  fetchResource,
 } from '../services/api';
 
 const sections = ['profile', 'skills', 'projects', 'experiences', 'certifications', 'messages'];
@@ -54,6 +55,7 @@ function formatItem(resource, item) {
       ...item,
       technologies: item.technologies?.join(', ') || '',
       image: null,
+      images: null,
     };
   }
   if (resource === 'certifications') {
@@ -117,6 +119,7 @@ function initialForm(resource) {
         github_url: '',
         demo_url: '',
         image: null,
+        images: null,
       };
     case 'experiences':
       return { company: '', position: '', location: '', start_date: '', end_date: '', description: '' };
@@ -134,6 +137,7 @@ export default function AdminDashboard() {
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(initialForm('profile'));
   const [message, setMessage] = useState('');
+  const sectionRef = useRef(section);
 
   const apiMap = useMemo(
     () => ({
@@ -162,30 +166,21 @@ export default function AdminDashboard() {
   );
 
   useEffect(() => {
-    async function loadUser() {
-      const token = getAuthToken();
-      if (!token) {
-        return;
-      }
-      try {
-        const currentUser = await getMe();
-        setUser(currentUser);
-      } catch {
-        clearAuthToken();
-      }
-    }
-
-    loadUser();
+    // Désactiver toute connexion automatique côté client pour raisons de sécurité
+    // (l'administrateur doit saisir ses identifiants manuellement)
+    clearAuthToken();
+    setUser(null);
   }, []);
 
   useEffect(() => {
+    sectionRef.current = section;
     if (!user) {
       return;
     }
     if (section === 'profile') {
       loadProfile();
     } else {
-      loadItems();
+      loadItems(section);
     }
   // loadProfile/loadItems depend on the active section and are intentionally called from this effect.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -202,10 +197,13 @@ export default function AdminDashboard() {
     }
   };
 
-  const loadItems = async () => {
+  const loadItems = async (targetSection = section) => {
     try {
-      const data = await apiMap[section].fetch();
-      setItems(data.map((item) => formatItem(section, item)));
+      const data = await apiMap[targetSection].fetch();
+      if (sectionRef.current !== targetSection) {
+        return;
+      }
+      setItems(data.map((item) => formatItem(targetSection, item)));
     } catch {
       setMessage('Erreur de chargement des données.');
     }
@@ -242,15 +240,34 @@ export default function AdminDashboard() {
 
   const selectSection = (target) => {
     setSection(target);
+    sectionRef.current = target;
+    setItems([]);
     setSelected(null);
     setForm(initialForm(target));
+    setMessage('');
   };
 
   const handleSelectItem = (item) => {
-    setSelected(item);
-    setForm(formatItem(section, item));
-    setMessage('');
+    // Récupérer les données complètes côté serveur (pour notamment charger la galerie)
+    (async () => {
+      try {
+        if (apiMap[section]) {
+          const detail = await fetchResource(`${apiMap[section].path}/${item.id}`);
+          setSelected(detail);
+          setForm(formatItem(section, detail));
+        } else {
+          setSelected(item);
+          setForm(formatItem(section, item));
+        }
+        setMessage('');
+      } catch (err) {
+        setMessage('Impossible de charger l\'élément.');
+      }
+    })();
   };
+
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryImages, setGalleryImages] = useState([]);
 
   const handleDelete = async (item) => {
     if (!window.confirm('Supprimer cet élément ?')) {
@@ -312,6 +329,9 @@ export default function AdminDashboard() {
         formData.append('demo_url', form.demo_url);
         if (form.image instanceof File) {
           formData.append('image', form.image);
+        }
+        if (form.images instanceof FileList) {
+          Array.from(form.images).forEach((file) => formData.append('images[]', file));
         }
         payload = formData;
       }
@@ -669,6 +689,39 @@ export default function AdminDashboard() {
                       onChange={(e) => setForm({ ...form, image: e.target.files?.[0] ?? null })}
                     />
                   </label>
+                  <label>
+                    Images supplémentaires
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => setForm({ ...form, images: e.target.files ?? null })}
+                    />
+                  </label>
+                  {form.image_url || form.gallery_images?.length ? (
+                    <div className="project-admin-preview full-width">
+                      {form.image_url ? (
+                        <a href={form.image_url} target="_blank" rel="noreferrer">Voir l’image principale</a>
+                      ) : null}
+                      {form.gallery_images?.map((image, index) => (
+                        <a key={image.id || image.url} href={image.url} target="_blank" rel="noreferrer">
+                          Voir image {index + 1}
+                        </a>
+                      ))}
+                      <div style={{marginTop:8}}>
+                        <button
+                          type="button"
+                          className="button button-link"
+                          onClick={() => {
+                            setGalleryImages([...(form.image_url ? [{ url: form.image_url }] : []), ...(form.gallery_images || [])]);
+                            setGalleryOpen(true);
+                          }}
+                        >
+                          <FaEye /> Voir la galerie
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
                 </>
               )}
 
@@ -797,20 +850,38 @@ export default function AdminDashboard() {
           </div>
         </section>
       </main>
+      {galleryOpen && (
+        <div className="gallery-modal">
+          <div className="gallery-backdrop" onClick={() => setGalleryOpen(false)} />
+          <div className="gallery-panel">
+            <div className="gallery-header">
+              <button type="button" className="button button-link" onClick={() => setGalleryOpen(false)}>Fermer</button>
+            </div>
+            <div className="gallery-grid">
+              {galleryImages.map((img, idx) => (
+                <div key={idx} className="gallery-item">
+                  <img src={img.url} alt={`Image ${idx + 1}`} style={{maxWidth:'100%',borderRadius:8}} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function AdminLogin({ onLogin, message }) {
   const [credentials, setCredentials] = useState({
-    email: 'wiltchout@gmail.com',
-    password: 'MostWanted17',
+    email: '',
+    password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form
       className="login-form"
+      autoComplete="off"
       onSubmit={(event) => {
         event.preventDefault();
         onLogin(credentials.email, credentials.password);
@@ -820,6 +891,8 @@ function AdminLogin({ onLogin, message }) {
         Email
         <input
           type="email"
+          name="admin_email"
+          autoComplete="off"
           value={credentials.email}
           onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
           required
@@ -830,6 +903,8 @@ function AdminLogin({ onLogin, message }) {
         <span className="password-field">
           <input
             type={showPassword ? 'text' : 'password'}
+            name="admin_password"
+            autoComplete="new-password"
             value={credentials.password}
             onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
             required

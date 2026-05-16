@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FaGithub, FaLinkedin, FaArrowRight, FaWhatsapp, FaEnvelope, FaDownload, FaMapMarkerAlt, FaUser } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaArrowRight, FaWhatsapp, FaEnvelope, FaDownload, FaMapMarkerAlt, FaUser, FaImages, FaTimes } from 'react-icons/fa';
 import * as FramerMotion from 'framer-motion';
 import { getTechIcon } from '../constants/iconMap';
 import { useTranslation } from '../i18n';
@@ -137,6 +137,7 @@ export default function Home() {
   const [profile, setProfile] = useState(defaultProfile);
   const [contact, setContact] = useState({ name: '', email: '', subject: '', message: '' });
   const [status, setStatus] = useState(null);
+  const [galleryProject, setGalleryProject] = useState(null);
 
   useEffect(() => {
     fetchProfile().then((data) => setProfile({ ...defaultProfile, ...data })).catch(console.error);
@@ -338,6 +339,10 @@ export default function Home() {
             projects.map((project) => {
               const projectType = project.project_type || project.category || 'personnel';
               const statusLabel = project.status || 'terminé';
+              const galleryImages = [
+                project.image_url ? { id: 'main', url: project.image_url } : null,
+                ...(project.gallery_images || []),
+              ].filter(Boolean);
 
               return (
                 <Motion.article
@@ -376,6 +381,11 @@ export default function Home() {
                           {t('projects.demo')} <FaArrowRight />
                         </a>
                       ) : null}
+                      {galleryImages.length > 0 ? (
+                        <button type="button" onClick={() => setGalleryProject({ ...project, galleryImages })}>
+                          <FaImages /> {t('projects.images')}
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 </Motion.article>
@@ -386,6 +396,27 @@ export default function Home() {
           )}
         </Motion.div>
       </MotionSection>
+
+      {galleryProject ? (
+        <div className="gallery-modal" role="dialog" aria-modal="true" aria-label={galleryProject.title}>
+          <button className="gallery-backdrop" type="button" onClick={() => setGalleryProject(null)} aria-label="Fermer" />
+          <div className="gallery-panel">
+            <div className="gallery-header">
+              <h3>{galleryProject.title}</h3>
+              <button type="button" onClick={() => setGalleryProject(null)} aria-label="Fermer">
+                <FaTimes />
+              </button>
+            </div>
+            <div className="gallery-grid">
+              {galleryProject.galleryImages.map((image, index) => (
+                <a href={image.url} target="_blank" rel="noreferrer" key={image.id || image.url}>
+                  <img src={image.url} alt={`${galleryProject.title} ${index + 1}`} />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <MotionSection className="section section-alt" id="experience">
         <div className="section-header">

@@ -91,6 +91,10 @@ export function getMe() {
   });
 }
 
+export function fetchResource(path) {
+  return request(path);
+}
+
 export function fetchSkills(options = {}) {
   return request(options.includeInactive ? '/skills?include_inactive=1' : '/skills');
 }
