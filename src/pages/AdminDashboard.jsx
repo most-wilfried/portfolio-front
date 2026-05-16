@@ -231,12 +231,24 @@ export default function AdminDashboard() {
     if (form.file instanceof File && form.file.type.startsWith('image/')) {
       urls.certificationFile = URL.createObjectURL(form.file);
     }
+    if (form.images instanceof FileList) {
+      urls.galleryImages = Array.from(form.images).map((file) => ({
+        name: file.name,
+        url: URL.createObjectURL(file),
+      }));
+    }
     setPreviews(urls);
 
     return () => {
-      Object.values(urls).forEach((url) => URL.revokeObjectURL(url));
+      Object.entries(urls).forEach(([key, value]) => {
+        if (key === 'galleryImages') {
+          value.forEach((image) => URL.revokeObjectURL(image.url));
+          return;
+        }
+        URL.revokeObjectURL(value);
+      });
     };
-  }, [form.avatar, form.image, form.file]);
+  }, [form.avatar, form.image, form.file, form.images]);
 
   const notify = (text, type = 'success') => {
     setMessage(text);
@@ -843,6 +855,16 @@ export default function AdminDashboard() {
                       onChange={(e) => setForm({ ...form, images: e.target.files ?? null })}
                     />
                   </label>
+                  {previews.galleryImages?.length ? (
+                    <div className="upload-preview-strip full-width">
+                      {previews.galleryImages.map((image) => (
+                        <figure key={image.url}>
+                          <img src={image.url} alt={image.name} />
+                          <figcaption>{image.name}</figcaption>
+                        </figure>
+                      ))}
+                    </div>
+                  ) : null}
                   {form.image_url || form.gallery_images?.length ? (
                     <div className="project-admin-preview full-width">
                       {form.image_url ? (

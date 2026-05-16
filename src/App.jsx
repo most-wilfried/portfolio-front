@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { FaGlobe, FaMoon, FaSun } from 'react-icons/fa';
+import { AnimatePresence, motion as Motion } from 'framer-motion';
 import Home from './pages/Home';
 import AdminDashboard from './pages/AdminDashboard';
 import { LanguageProvider, useTranslation } from './i18n';
@@ -29,6 +30,23 @@ function Navigation({ theme, onToggleTheme }) {
   const { language, t, toggleLanguage } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    document.body.classList.toggle('nav-lock', menuOpen);
+
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.body.classList.remove('nav-lock');
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [menuOpen]);
+
   const handleNavClick = (event, path) => {
     if (!path.startsWith('/#')) {
       setMenuOpen(false);
@@ -42,53 +60,97 @@ function Navigation({ theme, onToggleTheme }) {
     setMenuOpen(false);
   };
 
+  const navLinks = (
+    <>
+      {NAV_LINKS.map((link) => (
+        <a
+          key={link.labelKey}
+          href={link.path}
+          onClick={(event) => handleNavClick(event, link.path)}
+        >
+          {t(link.labelKey)}
+        </a>
+      ))}
+    </>
+  );
+
   return (
-    <header className={menuOpen ? 'app-header menu-open' : 'app-header'}>
-      <div className="brand">{t('brand')}</div>
-      <button
-        className="menu-toggle"
-        type="button"
-        onClick={() => setMenuOpen((value) => !value)}
-        aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-        aria-expanded={menuOpen}
-      >
-        <span className="hamburger-lines" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </span>
-      </button>
-      <nav className="main-nav">
-        {NAV_LINKS.map((link) => (
-          <a
-            key={link.labelKey}
-            href={link.path}
-            onClick={(event) => handleNavClick(event, link.path)}
+    <>
+      <header className={menuOpen ? 'app-header menu-open' : 'app-header'}>
+        <a className="brand" href="/" onClick={() => setMenuOpen(false)}>{t('brand')}</a>
+        <nav className="main-nav desktop-nav">
+          {navLinks}
+        </nav>
+        <div className="header-actions">
+          <button
+            className="icon-toggle"
+            onClick={toggleLanguage}
+            aria-label={t('language.switch')}
+            title={t('language.switch')}
           >
-            {t(link.labelKey)}
-          </a>
-        ))}
-      </nav>
-      <div className="header-actions">
-        <button
-          className="icon-toggle"
-          onClick={toggleLanguage}
-          aria-label={t('language.switch')}
-          title={t('language.switch')}
-        >
-          <FaGlobe />
-          <span>{language.toUpperCase()}</span>
-        </button>
-        <button
-          className="icon-toggle"
-          onClick={onToggleTheme}
-          aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')}
-          title={theme === 'dark' ? t('theme.light') : t('theme.dark')}
-        >
-          {theme === 'dark' ? <FaSun /> : <FaMoon />}
-        </button>
-      </div>
-    </header>
+            <FaGlobe />
+            <span>{language.toUpperCase()}</span>
+          </button>
+          <button
+            className="icon-toggle"
+            onClick={onToggleTheme}
+            aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')}
+            title={theme === 'dark' ? t('theme.light') : t('theme.dark')}
+          >
+            {theme === 'dark' ? <FaSun /> : <FaMoon />}
+          </button>
+          <button
+            className="menu-toggle"
+            type="button"
+            onClick={() => setMenuOpen((value) => !value)}
+            aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={menuOpen}
+          >
+            <span className="hamburger-lines" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+          </button>
+        </div>
+      </header>
+      <AnimatePresence>
+        {menuOpen ? (
+          <Motion.div
+            className="mobile-nav-layer"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <button
+              className="mobile-nav-backdrop"
+              type="button"
+              aria-label="Fermer le menu"
+              onClick={() => setMenuOpen(false)}
+            />
+            <Motion.nav
+              className="mobile-nav-panel"
+              initial={{ opacity: 0, x: 34, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 34, scale: 0.98 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="mobile-nav-head">
+                <span>{t('brand')}</span>
+                <button type="button" className="mobile-nav-close" onClick={() => setMenuOpen(false)} aria-label="Fermer le menu">
+                  <span />
+                  <span />
+                </button>
+              </div>
+              <div className="mobile-nav-links">
+                {navLinks}
+              </div>
+            </Motion.nav>
+          </Motion.div>
+        ) : null}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -99,11 +161,7 @@ function AdminAccess() {
     return null;
   }
 
-  return (
-    <footer className="site-footer">
-      <a href="/admin" aria-label="Accès administration">admin</a>
-    </footer>
-  );
+  return null;
 }
 
 export default function App() {

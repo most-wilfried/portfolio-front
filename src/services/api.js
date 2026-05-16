@@ -1,5 +1,12 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '/api' : 'http://127.0.0.1:8000/api');
-const LOCAL_API_FALLBACKS = import.meta.env.PROD ? ['/api'] : ['http://127.0.0.1:8000/api', 'http://127.0.0.1:8001/api'];
+const DEV_API_BASE =
+  typeof window === 'undefined'
+    ? 'http://127.0.0.1:8000/api'
+    : `${window.location.protocol}//${window.location.hostname}:8000/api`;
+
+const API_BASE = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '/api' : DEV_API_BASE);
+const LOCAL_API_FALLBACKS = import.meta.env.PROD
+  ? ['/api']
+  : [DEV_API_BASE, 'http://127.0.0.1:8000/api', 'http://127.0.0.1:8001/api'];
 
 function getApiBases() {
   const storedBase = import.meta.env.PROD ? null : localStorage.getItem('portfolio_api_base');
@@ -22,10 +29,12 @@ function jsonHeaders(withAuth = false) {
 async function request(path, options = {}) {
   let response;
   let lastNetworkError;
+  let activeBaseUrl;
 
   for (const baseUrl of getApiBases()) {
     try {
       response = await fetch(`${baseUrl}${path}`, options);
+      activeBaseUrl = baseUrl;
       localStorage.setItem('portfolio_api_base', baseUrl);
       break;
     } catch (error) {
@@ -52,10 +61,43 @@ async function request(path, options = {}) {
   }
 
   if (contentType?.includes('application/json')) {
-    return response.json();
+    const data = await response.json();
+    return normalizeStorageUrls(data, activeBaseUrl);
   }
 
   return null;
+}
+
+function normalizeStorageUrls(value, apiBaseUrl) {
+  if (!apiBaseUrl || value == null) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const storagePath = value.startsWith('/storage/') ? value : value.startsWith('storage/') ? `/${value}` : null;
+    if (!storagePath) {
+      return value;
+    }
+
+    return new URL(storagePath, apiBaseUrl.replace(/\/api\/?$/, '')).toString();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => normalizeStorageUrls(item, apiBaseUrl));
+  }
+
+  if (typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        key.endsWith('_url') || key === 'url' || key === 'gallery_images'
+          ? normalizeStorageUrls(item, apiBaseUrl)
+          : item,
+      ]),
+    );
+  }
+
+  return value;
 }
 
 export function setAuthToken(token) {

@@ -29,7 +29,7 @@
   "projects.empty": "Aucun projet publié pour le moment.",
   "projects.github": "Code GitHub",
   "projects.demo": "Demo",
-  "projects.images": "Images",
+  "projects.images": "Voir images",
   "projects.year": "Année",
   "projects.type": "Type",
   "projects.status": "Statut",
@@ -59,5 +59,7 @@
   "contact.send": "Envoyer",
   "contact.sending": "Envoi en cours...",
   "contact.success": "Message envoyé avec succès !",
-  "contact.error": "Erreur lors de l’envoi du message."
+  "contact.error": "Erreur lors de l’envoi du message.",
+  "footer.backTop": "Retour en haut",
+  "footer.rights": "Tous droits réservés."
 }
