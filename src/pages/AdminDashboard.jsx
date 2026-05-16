@@ -11,7 +11,6 @@ import {
   fetchProjects,
   fetchSkills,
   getMe,
-  getAuthToken,
   login,
   logout,
   updateProfile,
@@ -142,19 +141,19 @@ export default function AdminDashboard() {
   const apiMap = useMemo(
     () => ({
       skills: {
-        fetch: () => fetchSkills({ includeInactive: true }),
+        fetch: () => fetchSkills({ includeInactive: true, auth: true }),
         path: '/skills',
       },
       projects: {
-        fetch: fetchProjects,
+        fetch: () => fetchProjects({ auth: true }),
         path: '/projects',
       },
       experiences: {
-        fetch: fetchExperiences,
+        fetch: () => fetchExperiences({ auth: true }),
         path: '/experiences',
       },
       certifications: {
-        fetch: fetchCertifications,
+        fetch: () => fetchCertifications({ auth: true }),
         path: '/certifications',
       },
       messages: {
@@ -199,6 +198,7 @@ export default function AdminDashboard() {
 
   const loadItems = async (targetSection = section) => {
     try {
+      setMessage('');
       const data = await apiMap[targetSection].fetch();
       if (sectionRef.current !== targetSection) {
         return;
@@ -247,20 +247,22 @@ export default function AdminDashboard() {
     setMessage('');
   };
 
-  const handleSelectItem = (item) => {
-    // Récupérer les données complètes côté serveur (pour notamment charger la galerie)
+  const handleSelectItem = (item, targetSection = section) => {
     (async () => {
       try {
-        if (apiMap[section]) {
-          const detail = await fetchResource(`${apiMap[section].path}/${item.id}`);
+        if (apiMap[targetSection]) {
+          const detail = await fetchResource(`${apiMap[targetSection].path}/${item.id}`, { auth: true });
+          if (sectionRef.current !== targetSection) {
+            return;
+          }
           setSelected(detail);
-          setForm(formatItem(section, detail));
+          setForm(formatItem(targetSection, detail));
         } else {
           setSelected(item);
-          setForm(formatItem(section, item));
+          setForm(formatItem(targetSection, item));
         }
         setMessage('');
-      } catch (err) {
+      } catch {
         setMessage('Impossible de charger l\'élément.');
       }
     })();
@@ -274,11 +276,12 @@ export default function AdminDashboard() {
       return;
     }
     try {
-      await deleteResource(`${apiMap[section].path}/${item.id}`);
+      const targetSection = sectionRef.current;
+      await deleteResource(`${apiMap[targetSection].path}/${item.id}`);
       setMessage('Élément supprimé.');
-      loadItems();
+      loadItems(targetSection);
       setSelected(null);
-      setForm(initialForm(section));
+      setForm(initialForm(targetSection));
     } catch {
       setMessage('Erreur lors de la suppression.');
     }
@@ -289,8 +292,9 @@ export default function AdminDashboard() {
     setMessage('Sauvegarde en cours...');
 
     try {
+      const targetSection = sectionRef.current;
       let payload = form;
-      if (section === 'profile') {
+      if (targetSection === 'profile') {
         const formData = new FormData();
         formData.append('full_name', form.full_name);
         formData.append('age', form.age || '');
@@ -316,7 +320,7 @@ export default function AdminDashboard() {
         loadProfile();
         return;
       }
-      if (section === 'projects') {
+      if (targetSection === 'projects') {
         const formData = new FormData();
         formData.append('title', form.title);
         formData.append('description', form.description);
@@ -335,7 +339,7 @@ export default function AdminDashboard() {
         }
         payload = formData;
       }
-      if (section === 'certifications') {
+      if (targetSection === 'certifications') {
         const formData = new FormData();
         formData.append('title', form.title);
         formData.append('issuer', form.issuer);
@@ -349,16 +353,16 @@ export default function AdminDashboard() {
       }
 
       if (selected) {
-        await updateResource(`${apiMap[section].path}/${selected.id}`, payload);
+        await updateResource(`${apiMap[targetSection].path}/${selected.id}`, payload);
         setMessage('Mise à jour réussie.');
       } else {
-        await createResource(apiMap[section].path, payload instanceof FormData ? payload : payload);
+        await createResource(apiMap[targetSection].path, payload);
         setMessage('Création réussie.');
       }
 
-      loadItems();
+      loadItems(targetSection);
       setSelected(null);
-      setForm(initialForm(section));
+      setForm(initialForm(targetSection));
     } catch (error) {
       setMessage(error?.message || 'Erreur lors de l’enregistrement.');
     }
@@ -435,7 +439,7 @@ export default function AdminDashboard() {
                   <button
                     key={item.id}
                     className={selected?.id === item.id ? 'resource-item active' : 'resource-item'}
-                    onClick={() => handleSelectItem(item)}
+                    onClick={() => handleSelectItem(item, section)}
                   >
                     <strong>{item.title || item.name || item.position || item.subject || item.issuer}</strong>
                     {section === 'messages' ? <span>{item.email}</span> : null}
@@ -708,7 +712,7 @@ export default function AdminDashboard() {
                           Voir image {index + 1}
                         </a>
                       ))}
-                      <div style={{marginTop:8}}>
+                      <div className="project-gallery-action">
                         <button
                           type="button"
                           className="button button-link"
@@ -877,23 +881,30 @@ function AdminLogin({ onLogin, message }) {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [allowInput, setAllowInput] = useState(false);
+  const enableManualInput = () => setAllowInput(true);
 
   return (
     <form
       className="login-form"
-      autoComplete="off"
+      autoComplete="new-password"
       onSubmit={(event) => {
         event.preventDefault();
         onLogin(credentials.email, credentials.password);
       }}
     >
+      <input className="login-decoy" type="text" name="email" autoComplete="username" tabIndex="-1" aria-hidden="true" />
+      <input className="login-decoy" type="password" name="password" autoComplete="current-password" tabIndex="-1" aria-hidden="true" />
       <label>
         Email
         <input
           type="email"
-          name="admin_email"
+          name="admin_manual_email"
           autoComplete="off"
+          readOnly={!allowInput}
           value={credentials.email}
+          onFocus={enableManualInput}
+          onPointerDown={enableManualInput}
           onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
           required
         />
@@ -903,9 +914,12 @@ function AdminLogin({ onLogin, message }) {
         <span className="password-field">
           <input
             type={showPassword ? 'text' : 'password'}
-            name="admin_password"
+            name="admin_manual_password"
             autoComplete="new-password"
+            readOnly={!allowInput}
             value={credentials.password}
+            onFocus={enableManualInput}
+            onPointerDown={enableManualInput}
             onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
             required
           />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { FaBars, FaGlobe, FaMoon, FaSun, FaTimes } from 'react-icons/fa';
+import { FaGlobe, FaMoon, FaSun } from 'react-icons/fa';
 import Home from './pages/Home';
 import AdminDashboard from './pages/AdminDashboard';
 import { LanguageProvider, useTranslation } from './i18n';
@@ -52,7 +52,11 @@ function Navigation({ theme, onToggleTheme }) {
         aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
         aria-expanded={menuOpen}
       >
-        {menuOpen ? <FaTimes /> : <FaBars />}
+        <span className="hamburger-lines" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
       </button>
       <nav className="main-nav">
         {NAV_LINKS.map((link) => (

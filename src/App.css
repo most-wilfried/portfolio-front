@@ -83,6 +83,27 @@ html, body { overflow-x: hidden; }
   transition: transform 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
+.hamburger-lines {
+  width: 1.15rem;
+  height: 0.9rem;
+  display: grid;
+  align-content: space-between;
+}
+
+.hamburger-lines span {
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: center;
+  transition: transform 0.25s ease, opacity 0.2s ease, width 0.25s ease;
+}
+
+.hamburger-lines span:nth-child(2) {
+  width: 78%;
+  justify-self: end;
+}
+
 .menu-toggle:hover {
   border-color: color-mix(in srgb, var(--accent) 45%, transparent);
   color: var(--accent);
@@ -1069,7 +1090,9 @@ html, body { overflow-x: hidden; }
 
 .admin-panel {
   display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
   gap: 1.5rem;
+  align-items: start;
 }
 
 .admin-list {
@@ -1126,6 +1149,19 @@ html, body { overflow-x: hidden; }
 .project-admin-preview a {
   color: var(--accent);
   font-weight: 800;
+}
+
+.project-gallery-action {
+  width: 100%;
+}
+
+.login-decoy {
+  position: absolute;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0;
+  pointer-events: none;
+  clip-path: inset(50%);
 }
 
 .admin-form-card {
@@ -1216,7 +1252,7 @@ html, body { overflow-x: hidden; }
 @media (max-width: 900px) {
   .app-header {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
     padding: 0.85rem 1rem;
   }
@@ -1243,27 +1279,46 @@ html, body { overflow-x: hidden; }
     padding: 0;
     border: 0 solid transparent;
     transform: translateY(-8px);
-    transition: max-height 0.32s ease, opacity 0.22s ease, transform 0.32s ease, padding 0.32s ease, border-color 0.32s ease;
+    transition:
+      max-height 0.34s ease,
+      opacity 0.22s ease,
+      transform 0.34s ease,
+      padding 0.34s ease,
+      border-color 0.34s ease;
   }
 
   .app-header.menu-open .main-nav {
-    max-height: 460px;
+    max-height: 390px;
     opacity: 1;
-    padding: 0.75rem 0 0.2rem;
+    padding: 0.7rem 0 0.15rem;
     border-top: 1px solid var(--border);
     transform: translateY(0);
   }
 
-  /* Rotate the toggle slightly when menu open for a modern feel */
   .app-header.menu-open .menu-toggle {
-    transform: rotate(90deg) scale(1.02);
+    border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+    color: var(--accent);
+  }
+
+  .app-header.menu-open .hamburger-lines span:first-child {
+    transform: translateY(0.4rem) rotate(45deg);
+  }
+
+  .app-header.menu-open .hamburger-lines span:nth-child(2) {
+    opacity: 0;
+    width: 0;
+  }
+
+  .app-header.menu-open .hamburger-lines span:last-child {
+    transform: translateY(-0.4rem) rotate(-45deg);
   }
 
   .main-nav a {
     width: 100%;
     border-radius: 0.8rem;
-    padding: 0.75rem 0.85rem;
+    padding: 0.68rem 0.85rem;
     background: color-mix(in srgb, var(--surface-soft) 70%, transparent);
+    font-size: 0.92rem;
   }
 
   .hero-section {
@@ -1310,6 +1365,10 @@ html, body { overflow-x: hidden; }
     margin-left: 0;
     padding: 1.2rem;
   }
+
+  .admin-panel {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 680px) {
@@ -1325,6 +1384,10 @@ html, body { overflow-x: hidden; }
   .brand {
     font-size: 0.92rem;
     letter-spacing: 0.05em;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .header-actions {
@@ -1345,11 +1408,27 @@ html, body { overflow-x: hidden; }
 
   .page-shell {
     width: min(100% - 1rem, 1140px);
-    padding: 1rem 0 2.75rem;
+    padding: 0.75rem 0 2.5rem;
+  }
+
+  .hero-section {
+    gap: 1.25rem;
+    padding: 2.1rem 0 1.1rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2rem, 11vw, 2.75rem);
+    line-height: 1;
+  }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.75rem;
   }
 
   .section {
-    padding: 2.25rem 0;
+    padding: 1.9rem 0;
   }
 
   .section-alt {
@@ -1363,11 +1442,34 @@ html, body { overflow-x: hidden; }
   }
 
   .section-header h2 {
-    font-size: clamp(1.6rem, 8vw, 2.1rem);
+    font-size: clamp(1.45rem, 7vw, 2rem);
   }
 
   .hero-description {
-    font-size: 1rem;
+    margin-top: 1rem;
+    font-size: 0.98rem;
+    line-height: 1.58;
+  }
+
+  .profile-facts {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .profile-facts span {
+    padding: 0.45rem 0.65rem;
+    font-size: 0.82rem;
+  }
+
+  .hero-avatar,
+  .hero-avatar-placeholder {
+    min-height: 250px;
+  }
+
+  .hero-avatar img,
+  .hero-avatar-placeholder,
+  .avatar-ring {
+    border-radius: 1.15rem;
   }
 
   .hero-actions,
@@ -1380,7 +1482,8 @@ html, body { overflow-x: hidden; }
   .button-link {
     width: 100%;
     justify-content: center;
-    padding: 0.82rem 1rem;
+    padding: 0.76rem 0.9rem;
+    font-size: 0.92rem;
   }
 
   .skill-grid,
@@ -1404,6 +1507,10 @@ html, body { overflow-x: hidden; }
     gap: 0.8rem;
   }
 
+  .skill-card-header {
+    gap: 0.6rem;
+  }
+
   .skill-icon {
     width: 2.55rem;
     height: 2.55rem;
@@ -1418,24 +1525,30 @@ html, body { overflow-x: hidden; }
 
   .project-card,
   .project-overlay {
-    min-height: 390px;
+    min-height: 330px;
   }
 
   .project-overlay {
     opacity: 1;
     transform: none;
-    padding: 1rem;
+    padding: 0.9rem;
   }
 
   .project-card h3 {
-    font-size: 1.25rem;
+    font-size: 1.18rem;
+  }
+
+  .project-overlay p {
+    font-size: 0.9rem;
+    line-height: 1.45;
   }
 
   .card-actions a,
   .card-actions button {
     width: 100%;
     justify-content: center;
-    padding: 0.68rem 0.82rem;
+    padding: 0.62rem 0.78rem;
+    font-size: 0.88rem;
   }
 
   .gallery-modal {
@@ -1467,6 +1580,15 @@ html, body { overflow-x: hidden; }
     border-radius: 1.2rem;
   }
 
+  .admin-shell {
+    padding: 0.65rem;
+  }
+
+  .admin-sidebar,
+  .admin-content {
+    border-radius: 1.1rem;
+  }
+
   .admin-header h1 {
     font-size: 1.45rem;
     margin: 0 0 0.35rem;
@@ -1484,6 +1606,17 @@ html, body { overflow-x: hidden; }
 
   .admin-sidebar nav {
     grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .nav-link,
+  .resource-item {
+    padding: 0.75rem 0.85rem;
+    border-radius: 0.75rem;
+  }
+
+  .admin-items {
+    max-height: 320px;
   }
 
   .floating-actions {

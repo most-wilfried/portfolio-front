@@ -11,6 +11,14 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+function jsonHeaders(withAuth = false) {
+  return {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    ...(withAuth ? authHeaders() : {}),
+  };
+}
+
 async function request(path, options = {}) {
   let response;
   let lastNetworkError;
@@ -65,7 +73,7 @@ export function getAuthToken() {
 export function login(email, password) {
   return request('/login', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    headers: jsonHeaders(),
     body: JSON.stringify({ email, password }),
   });
 }
@@ -73,30 +81,26 @@ export function login(email, password) {
 export function logout() {
   return request('/logout', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...authHeaders(),
-    },
+    headers: jsonHeaders(true),
   });
 }
 
 export function getMe() {
   return request('/me', {
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...authHeaders(),
-    },
+    headers: jsonHeaders(true),
   });
 }
 
-export function fetchResource(path) {
-  return request(path);
+export function fetchResource(path, options = {}) {
+  return request(path, {
+    headers: options.auth ? jsonHeaders(true) : jsonHeaders(),
+  });
 }
 
 export function fetchSkills(options = {}) {
-  return request(options.includeInactive ? '/skills?include_inactive=1' : '/skills');
+  return request(options.includeInactive ? '/skills?include_inactive=1' : '/skills', {
+    headers: options.auth ? jsonHeaders(true) : jsonHeaders(),
+  });
 }
 
 export function fetchProfile() {
@@ -107,32 +111,34 @@ export function updateProfile(data) {
   return updateResource('/profile', data);
 }
 
-export function fetchProjects() {
-  return request('/projects');
+export function fetchProjects(options = {}) {
+  return request('/projects', {
+    headers: options.auth ? jsonHeaders(true) : jsonHeaders(),
+  });
 }
 
-export function fetchExperiences() {
-  return request('/experiences');
+export function fetchExperiences(options = {}) {
+  return request('/experiences', {
+    headers: options.auth ? jsonHeaders(true) : jsonHeaders(),
+  });
 }
 
-export function fetchCertifications() {
-  return request('/certifications');
+export function fetchCertifications(options = {}) {
+  return request('/certifications', {
+    headers: options.auth ? jsonHeaders(true) : jsonHeaders(),
+  });
 }
 
 export function fetchMessages() {
   return request('/messages', {
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...authHeaders(),
-    },
+    headers: jsonHeaders(true),
   });
 }
 
 export function sendContactMessage(data) {
   return request('/contact', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    headers: jsonHeaders(),
     body: JSON.stringify(data),
   });
 }
@@ -152,11 +158,7 @@ export function createResource(path, data) {
   } else {
     options = {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ...authHeaders(),
-      },
+      headers: jsonHeaders(true),
       body: JSON.stringify(data),
     };
   }
@@ -180,11 +182,7 @@ export function updateResource(path, data) {
   } else {
     options = {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ...authHeaders(),
-      },
+      headers: jsonHeaders(true),
       body: JSON.stringify(data),
     };
   }
@@ -195,10 +193,6 @@ export function updateResource(path, data) {
 export function deleteResource(path) {
   return request(path, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...authHeaders(),
-    },
+    headers: jsonHeaders(true),
   });
 }
