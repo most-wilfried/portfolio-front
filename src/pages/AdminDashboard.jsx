@@ -1,5 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FaSave, FaSignOutAlt, FaPlus, FaTrash, FaEye, FaEyeSlash } from 'react-icons/fa';
+import {
+  FaEye,
+  FaEyeSlash,
+  FaImage,
+  FaPlus,
+  FaSave,
+  FaSignOutAlt,
+  FaSpinner,
+  FaTimes,
+  FaTrash,
+} from 'react-icons/fa';
 import {
   clearAuthToken,
   createResource,
@@ -69,11 +79,14 @@ function formatItem(resource, item) {
       ...item,
       start_date: toDateInput(item.start_date),
       end_date: toDateInput(item.end_date),
+      technologies: item.technologies?.join(', ') || '',
     };
   }
   if (resource === 'skills') {
     return {
       ...item,
+      level: item.level || '',
+      color: item.color || '#2dd4bf',
       percentage: item.percentage ?? 70,
       display_order: item.display_order ?? 0,
       is_active: item.is_active ?? true,
@@ -105,7 +118,16 @@ function initialForm(resource) {
         cv_url: null,
       };
     case 'skills':
-      return { name: '', category: 'Frontend', icon: '', percentage: 70, display_order: 0, is_active: true };
+      return {
+        name: '',
+        category: 'Frontend',
+        level: '',
+        icon: '',
+        color: '#2dd4bf',
+        percentage: 70,
+        display_order: 0,
+        is_active: true,
+      };
     case 'projects':
       return {
         title: '',
@@ -121,7 +143,15 @@ function initialForm(resource) {
         images: null,
       };
     case 'experiences':
-      return { company: '', position: '', location: '', start_date: '', end_date: '', description: '' };
+      return {
+        company: '',
+        position: '',
+        location: '',
+        start_date: '',
+        end_date: '',
+        description: '',
+        technologies: '',
+      };
     case 'certifications':
       return { title: '', issuer: '', date: '', url: '', file: null, description: '' };
     default:
@@ -136,6 +166,11 @@ export default function AdminDashboard() {
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(initialForm('profile'));
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('success');
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deletingImageId, setDeletingImageId] = useState(null);
+  const [previews, setPreviews] = useState({});
   const sectionRef = useRef(section);
 
   const apiMap = useMemo(
@@ -185,19 +220,52 @@ export default function AdminDashboard() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, section]);
 
+  useEffect(() => {
+    const urls = {};
+    if (form.avatar instanceof File) {
+      urls.avatar = URL.createObjectURL(form.avatar);
+    }
+    if (form.image instanceof File) {
+      urls.projectImage = URL.createObjectURL(form.image);
+    }
+    if (form.file instanceof File && form.file.type.startsWith('image/')) {
+      urls.certificationFile = URL.createObjectURL(form.file);
+    }
+    setPreviews(urls);
+
+    return () => {
+      Object.values(urls).forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [form.avatar, form.image, form.file]);
+
+  const notify = (text, type = 'success') => {
+    setMessage(text);
+    setMessageType(type);
+  };
+
+  const resetEditor = (targetSection = sectionRef.current) => {
+    setSelected(null);
+    setForm(initialForm(targetSection));
+    notify('Formulaire prêt pour une nouvelle saisie.');
+  };
+
   const loadProfile = async () => {
     try {
+      setLoading(true);
       const data = await fetchProfile();
       setForm({ ...initialForm('profile'), ...data, avatar: null });
       setItems([]);
       setSelected(null);
     } catch {
-      setMessage('Erreur de chargement du profil.');
+      notify('Erreur de chargement du profil.', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
   const loadItems = async (targetSection = section) => {
     try {
+      setLoading(true);
       setMessage('');
       const data = await apiMap[targetSection].fetch();
       if (sectionRef.current !== targetSection) {
@@ -205,7 +273,9 @@ export default function AdminDashboard() {
       }
       setItems(data.map((item) => formatItem(targetSection, item)));
     } catch {
-      setMessage('Erreur de chargement des données.');
+      notify('Erreur de chargement des données.', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -215,14 +285,14 @@ export default function AdminDashboard() {
       setAuthToken(response.token);
       const currentUser = await getMe();
       setUser(currentUser);
-      setMessage('Connecté.');
+      notify('Connecté.');
     } catch (error) {
       const message =
         error?.message ||
         error?.errors?.email?.[0] ||
         error?.errors?.password?.[0] ||
         'Identifiants invalides.';
-      setMessage(message);
+      notify(message, 'error');
     }
   };
 
@@ -250,6 +320,7 @@ export default function AdminDashboard() {
   const handleSelectItem = (item, targetSection = section) => {
     (async () => {
       try {
+        setLoading(true);
         if (apiMap[targetSection]) {
           const detail = await fetchResource(`${apiMap[targetSection].path}/${item.id}`, { auth: true });
           if (sectionRef.current !== targetSection) {
@@ -261,9 +332,11 @@ export default function AdminDashboard() {
           setSelected(item);
           setForm(formatItem(targetSection, item));
         }
-        setMessage('');
+        notify('Élément chargé en mode modification.');
       } catch {
-        setMessage('Impossible de charger l\'élément.');
+        notify('Impossible de charger l\'élément.', 'error');
+      } finally {
+        setLoading(false);
       }
     })();
   };
@@ -276,22 +349,26 @@ export default function AdminDashboard() {
       return;
     }
     try {
+      setSaving(true);
       const targetSection = sectionRef.current;
       await deleteResource(`${apiMap[targetSection].path}/${item.id}`);
-      setMessage('Élément supprimé.');
+      notify('Élément supprimé.');
       loadItems(targetSection);
       setSelected(null);
       setForm(initialForm(targetSection));
     } catch {
-      setMessage('Erreur lors de la suppression.');
+      notify('Erreur lors de la suppression.', 'error');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage('Sauvegarde en cours...');
+    notify('Sauvegarde en cours...');
 
     try {
+      setSaving(true);
       const targetSection = sectionRef.current;
       let payload = form;
       if (targetSection === 'profile') {
@@ -316,7 +393,7 @@ export default function AdminDashboard() {
           formData.append('cv', form.cv);
         }
         await updateProfile(formData);
-        setMessage('Profil mis à jour.');
+        notify('Profil mis à jour.');
         loadProfile();
         return;
       }
@@ -354,19 +431,43 @@ export default function AdminDashboard() {
 
       if (selected) {
         await updateResource(`${apiMap[targetSection].path}/${selected.id}`, payload);
-        setMessage('Mise à jour réussie.');
+        notify('Mise à jour réussie.');
       } else {
         await createResource(apiMap[targetSection].path, payload);
-        setMessage('Création réussie.');
+        notify('Création réussie.');
       }
 
       loadItems(targetSection);
       setSelected(null);
       setForm(initialForm(targetSection));
     } catch (error) {
-      setMessage(error?.message || 'Erreur lors de l’enregistrement.');
+      notify(error?.message || 'Erreur lors de l’enregistrement.', 'error');
+    } finally {
+      setSaving(false);
     }
   };
+
+  const handleDeleteProjectImage = async (image) => {
+    if (!selected || !window.confirm('Supprimer cette image de la galerie ?')) {
+      return;
+    }
+
+    try {
+      setDeletingImageId(image.id);
+      const updatedProject = await deleteResource(`/projects/${selected.id}/images/${image.id}`);
+      setSelected(updatedProject);
+      setForm(formatItem('projects', updatedProject));
+      notify('Image supprimée de la galerie.');
+    } catch {
+      notify('Erreur lors de la suppression de l’image.', 'error');
+    } finally {
+      setDeletingImageId(null);
+    }
+  };
+
+  const currentImagePreview = previews.avatar || form.avatar_url;
+  const currentProjectImagePreview = previews.projectImage || form.image_url;
+  const currentCertificationPreview = previews.certificationFile || form.file_url;
 
   if (!user) {
     return (
@@ -381,6 +482,11 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-shell">
+      {message ? (
+        <div className={`admin-toast ${messageType === 'error' ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      ) : null}
       <aside className="admin-sidebar">
         <div className="admin-brand">
           <strong>Administrateur</strong>
@@ -421,9 +527,9 @@ export default function AdminDashboard() {
                 <button
                   className="button button-primary"
                   onClick={() => {
-                    setSelected(null);
-                    setForm(initialForm(section));
+                    resetEditor(section);
                   }}
+                  disabled={saving}
                 >
                   <FaPlus /> Nouveau
                 </button>
@@ -432,6 +538,8 @@ export default function AdminDashboard() {
             <div className="admin-items">
               {section === 'profile' ? (
                 <p className="empty-state">Photo, nom, titre et liens sociaux.</p>
+              ) : loading ? (
+                <p className="empty-state"><FaSpinner className="spin" /> Chargement...</p>
               ) : items.length === 0 ? (
                 <p className="empty-state">Aucun élément trouvé.</p>
               ) : (
@@ -454,7 +562,7 @@ export default function AdminDashboard() {
                 <h2>Profil public</h2>
                 <form onSubmit={handleSubmit} className="admin-form profile-form">
                   <div className="profile-upload-zone">
-                    {form.avatar_url ? <img className="profile-preview" src={form.avatar_url} alt="Photo de profil actuelle" /> : <div className="profile-preview profile-preview-empty">Photo</div>}
+                    {currentImagePreview ? <img className="profile-preview" src={currentImagePreview} alt="Photo de profil actuelle" /> : <div className="profile-preview profile-preview-empty">Photo</div>}
                     <label>
                       Photo de profil
                       <input
@@ -526,11 +634,10 @@ export default function AdminDashboard() {
                   </label>
                   {form.cv_url ? <a className="cv-link" href={form.cv_url} target="_blank" rel="noreferrer">CV actuel</a> : null}
                   <div className="admin-form-actions">
-                    <button type="submit" className="button button-primary">
-                      <FaSave /> Enregistrer le profil
+                    <button type="submit" className="button button-primary" disabled={saving}>
+                      {saving ? <FaSpinner className="spin" /> : <FaSave />} Enregistrer le profil
                     </button>
                   </div>
-                  {message ? <p className="form-status">{message}</p> : null}
                 </form>
               </>
             ) : section === 'messages' ? (
@@ -553,7 +660,7 @@ export default function AdminDashboard() {
               </div>
             ) : (
             <>
-              <h2>{selected ? 'Modifier' : 'Ajouter'} un élément</h2>
+              <h2>{selected ? `Modifier : ${selected.title || selected.name || selected.position || selected.issuer}` : 'Ajouter un élément'}</h2>
               <form onSubmit={handleSubmit} className="admin-form">
               {section === 'skills' && (
                 <>
@@ -580,6 +687,29 @@ export default function AdminDashboard() {
                       placeholder="Optionnel, ex: react"
                       onChange={(e) => setForm({ ...form, icon: e.target.value })}
                     />
+                  </label>
+                  <label>
+                    Niveau
+                    <input
+                      value={form.level || ''}
+                      placeholder="Ex: Avancé, Intermédiaire"
+                      onChange={(e) => setForm({ ...form, level: e.target.value })}
+                    />
+                  </label>
+                  <label>
+                    Couleur
+                    <span className="color-field">
+                      <input
+                        type="color"
+                        value={form.color || '#2dd4bf'}
+                        onChange={(e) => setForm({ ...form, color: e.target.value })}
+                      />
+                      <input
+                        value={form.color || ''}
+                        placeholder="#2dd4bf"
+                        onChange={(e) => setForm({ ...form, color: e.target.value })}
+                      />
+                    </span>
                   </label>
                   <label>
                     Pourcentage de maîtrise
@@ -693,6 +823,17 @@ export default function AdminDashboard() {
                       onChange={(e) => setForm({ ...form, image: e.target.files?.[0] ?? null })}
                     />
                   </label>
+                  {currentProjectImagePreview ? (
+                    <div className="image-preview-card">
+                      <img src={currentProjectImagePreview} alt="Aperçu du projet" />
+                      <span>{previews.projectImage ? 'Nouvelle image principale' : 'Image principale actuelle'}</span>
+                    </div>
+                  ) : (
+                    <div className="image-preview-card image-preview-empty">
+                      <FaImage />
+                      <span>Aucune image principale</span>
+                    </div>
+                  )}
                   <label>
                     Images supplémentaires
                     <input
@@ -708,9 +849,21 @@ export default function AdminDashboard() {
                         <a href={form.image_url} target="_blank" rel="noreferrer">Voir l’image principale</a>
                       ) : null}
                       {form.gallery_images?.map((image, index) => (
-                        <a key={image.id || image.url} href={image.url} target="_blank" rel="noreferrer">
-                          Voir image {index + 1}
-                        </a>
+                        <span key={image.id || image.url} className="gallery-admin-item">
+                          <a href={image.url} target="_blank" rel="noreferrer">
+                            Voir image {index + 1}
+                          </a>
+                          {image.id ? (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteProjectImage(image)}
+                              disabled={deletingImageId === image.id}
+                              aria-label={`Supprimer l’image ${index + 1}`}
+                            >
+                              {deletingImageId === image.id ? <FaSpinner className="spin" /> : <FaTrash />}
+                            </button>
+                          ) : null}
+                        </span>
                       ))}
                       <div className="project-gallery-action">
                         <button
@@ -772,6 +925,13 @@ export default function AdminDashboard() {
                     />
                   </label>
                   <label className="full-width">
+                    Technologies (séparées par des virgules)
+                    <input
+                      value={form.technologies || ''}
+                      onChange={(e) => setForm({ ...form, technologies: e.target.value })}
+                    />
+                  </label>
+                  <label className="full-width">
                     Description
                     <textarea
                       value={form.description}
@@ -827,6 +987,12 @@ export default function AdminDashboard() {
                       onChange={(e) => setForm({ ...form, file: e.target.files?.[0] ?? null })}
                     />
                   </label>
+                  {currentCertificationPreview && !String(currentCertificationPreview).toLowerCase().endsWith('.pdf') ? (
+                    <div className="image-preview-card">
+                      <img src={currentCertificationPreview} alt="Aperçu certification" />
+                      <span>Aperçu du fichier</span>
+                    </div>
+                  ) : null}
                   <label className="full-width">
                     Description
                     <textarea
@@ -838,16 +1004,20 @@ export default function AdminDashboard() {
               )}
 
               <div className="admin-form-actions">
-                <button type="submit" className="button button-primary">
-                  <FaSave /> {selected ? 'Mettre à jour' : 'Créer'}
+                <button type="submit" className="button button-primary" disabled={saving || loading}>
+                  {saving ? <FaSpinner className="spin" /> : <FaSave />} {selected ? 'Modifier' : 'Créer'}
                 </button>
                 {selected ? (
-                  <button type="button" className="button button-danger" onClick={() => handleDelete(selected)}>
+                  <button type="button" className="button button-danger" onClick={() => handleDelete(selected)} disabled={saving}>
                     <FaTrash /> Supprimer
                   </button>
                 ) : null}
+                {selected ? (
+                  <button type="button" className="button button-secondary" onClick={() => resetEditor(section)} disabled={saving}>
+                    <FaTimes /> Annuler
+                  </button>
+                ) : null}
               </div>
-              {message ? <p className="form-status">{message}</p> : null}
             </form>
             </>
             )}
