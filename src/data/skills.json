@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "name": "HTML",
+    "category": "Frontend",
+    "level": "Avancé",
+    "percentage": 85,
+    "is_active": true,
+    "display_order": 0
+  },
+  {
+    "id": 2,
+    "name": "CSS",
+    "category": "Frontend",
+    "level": "Avancé",
+    "percentage": 85,
+    "is_active": true,
+    "display_order": 1
+  },
+  {
+    "id": 3,
+    "name": "JavaScript",
+    "category": "Frontend",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 2
+  },
+  {
+    "id": 4,
+    "name": "React",
+    "category": "Frameworks",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 3
+  },
+  {
+    "id": 5,
+    "name": "PHP",
+    "category": "Backend",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 4
+  },
+  {
+    "id": 6,
+    "name": "Laravel",
+    "category": "Frameworks",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 5
+  },
+  {
+    "id": 7,
+    "name": "MySQL",
+    "category": "Base de données",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 6
+  },
+  {
+    "id": 8,
+    "name": "Flutter",
+    "category": "Mobile",
+    "level": "Débutant",
+    "percentage": 40,
+    "is_active": true,
+    "display_order": 7
+  },
+  {
+    "id": 9,
+    "name": "Arduino",
+    "category": "IoT / Électronique",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 8
+  },
+  {
+    "id": 10,
+    "name": "ESP32",
+    "category": "IoT / Électronique",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 9
+  },
+  {
+    "id": 11,
+    "name": "Git",
+    "category": "Outils",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 10
+  },
+  {
+    "id": 12,
+    "name": "GitHub",
+    "category": "Outils",
+    "level": "Intermédiaire",
+    "percentage": 65,
+    "is_active": true,
+    "display_order": 11
+  }
+]

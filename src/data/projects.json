@@ -1,0 +1,55 @@
+[
+  {
+    "id": 3,
+    "title": "GameZone — Gestion intelligente d’une salle de jeux vidéo",
+    "description": "Solution associant application desktop/mobile et IoT (ESP32) pour automatiser la gestion des postes, des sessions, des paiements et des équipements.",
+    "category": "IoT",
+    "project_type": "personnel",
+    "status": null,
+    "technologies": [
+      "ESP32"
+    ],
+    "image_url": "/media/projects/9lhARoOvuRu47A6IAWRmfzVbE4skmWKuxGxB1Ste.png",
+    "gallery_images": [
+      {
+        "id": 1,
+        "url": "/media/projects/gallery/M2Zb3cIqgl8ZKXKk4EGjHDOzoIqrWyevoLXp4zv1.jpg"
+      }
+    ],
+    "github_url": null,
+    "demo_url": null
+  },
+  {
+    "id": 1,
+    "title": "Système de sécurité intelligent avec ESP32",
+    "description": "Système embarqué associant ESP32, caméra, capteurs, Firebase et Flutter.",
+    "category": "IoT",
+    "project_type": "personnel",
+    "status": null,
+    "technologies": [
+      "ESP32",
+      "Arduino",
+      "Firebase",
+      "Flutter"
+    ],
+    "image_url": null,
+    "gallery_images": [],
+    "github_url": null,
+    "demo_url": null
+  },
+  {
+    "id": 2,
+    "title": "Gestion d’une agence de voyage",
+    "description": "Analyse et conception d’un système de gestion, collaboration via GitLab et mise en œuvre d’interfaces web.",
+    "category": "Web",
+    "project_type": "académique",
+    "status": null,
+    "technologies": [
+      "GitLab"
+    ],
+    "image_url": null,
+    "gallery_images": [],
+    "github_url": null,
+    "demo_url": null
+  }
+]
