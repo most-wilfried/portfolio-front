@@ -7,6 +7,8 @@
     "project_type": "personnel",
     "status": null,
     "technologies": [
+      "Flutter Desktop",
+      "SQLite",
       "ESP32"
     ],
     "image_url": "/media/projects/9lhARoOvuRu47A6IAWRmfzVbE4skmWKuxGxB1Ste.png",

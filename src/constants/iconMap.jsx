@@ -31,6 +31,8 @@ const iconMap = {
   python: DiPython,
   java: DiJava,
   flutter: SiFlutter,
+  flutterdesktop: SiFlutter,
+  sqlite: DiDatabase,
   android: DiAndroid,
   ios: DiApple,
   html: DiHtml5,

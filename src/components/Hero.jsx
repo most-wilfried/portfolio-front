@@ -2,15 +2,16 @@ import { useMotionPreference } from '../hooks/useMotionPreference';
 import { useRef } from 'react';
 import { motion as Motion, useScroll, useTransform } from 'framer-motion';
 import { FaArrowDown, FaArrowRight, FaDownload, FaEnvelope, FaGithub, FaLinkedin, FaMapMarkerAlt, FaUser, FaWhatsapp } from 'react-icons/fa';
-import { profile } from '../data/portfolio';
 import { useTranslation } from '../i18n';
 import { usePointerTilt } from '../hooks/usePointerTilt';
+import ProfessionalPhrases from './ProfessionalPhrases';
+import PhoneContacts from './PhoneContacts';
 
 const ease = [0.22, 1, 0.36, 1];
 const shape = '44% 56% 60% 40% / 45% 40% 60% 55%';
 
 export default function Hero() {
-  const { language, t } = useTranslation();
+  const { t, content: { profile } } = useTranslation();
   const ref = useRef(null);
   const reduced = useMotionPreference();
   const tilt = usePointerTilt(5);
@@ -23,9 +24,8 @@ export default function Hero() {
   const words = profile.full_name.split(' ');
   const whatsapp = profile.whatsapp_number ? String(profile.whatsapp_number).replace(/\D/g, '') : ''; 
   const facts = [
-    profile.age ? `${profile.age} ${language === 'fr' ? 'ans' : 'years old'}` : null,
+    profile.age ? t('hero.age', { age: profile.age }) : null,
     profile.location ? <><FaMapMarkerAlt /> {profile.location}</> : null,
-    profile.phone,
   ].filter(Boolean);
   const goTo = (event, id) => {
     event.preventDefault();
@@ -48,8 +48,11 @@ export default function Hero() {
           ))}
         </h1>
         <Motion.div initial={reduced ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduced ? 0 : 0.7, delay: reduced ? 0 : 0.6, ease }}>
+          <p className="hero-professional-subtitle">{profile.professional_subtitle}</p>
           <p className="hero-description">{profile.short_description}</p>
+          <ProfessionalPhrases />
           {facts.length ? <div className="profile-facts">{facts.map((fact, index) => <span key={index}>{fact}</span>)}</div> : null}
+          <PhoneContacts variant="hero" />
           <div className="hero-actions">
             <a className="button button-primary" href="#projects" onClick={(e) => goTo(e, 'projects')}>{t('hero.explore')}<FaArrowRight /></a>
             {profile.cv_url ? <a href={profile.cv_url} target="_blank" rel="noreferrer" className="button button-secondary"><FaDownload />{t('hero.cv')}</a> : null}
@@ -57,7 +60,7 @@ export default function Hero() {
           <div className="hero-social-links">
             {profile.github_url ? <a href={profile.github_url} target="_blank" rel="noreferrer"><FaGithub />GitHub</a> : null}
             {profile.linkedin_url ? <a href={profile.linkedin_url} target="_blank" rel="noreferrer"><FaLinkedin />LinkedIn</a> : null}
-            {whatsapp ? <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer"><FaWhatsapp />WhatsApp</a> : null}
+            {whatsapp ? <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer" aria-label={t('contact.whatsapp')} title={t('contact.whatsapp')}><FaWhatsapp aria-hidden="true" />WhatsApp</a> : null}
             {profile.email ? <a href={`mailto:${profile.email}`}><FaEnvelope />{t('hero.email')}</a> : null}
           </div>
         </Motion.div>

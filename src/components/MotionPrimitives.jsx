@@ -10,6 +10,7 @@ export function RevealHeading({ children }) {
   return (
     <Motion.h2 className="reveal-heading"
       initial={reduced ? false : 'hidden'}
+      animate={reduced ? 'visible' : 'hidden'}
       whileInView="visible"
       viewport={{ once: false, amount: 0.4 }}
     >

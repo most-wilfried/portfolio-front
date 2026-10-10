@@ -181,6 +181,15 @@ body.menu-nav-lock {
   }
 }
 
+@media (max-width: 420px) {
+  .app-header .brand {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.35;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

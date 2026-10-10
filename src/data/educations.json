@@ -1,0 +1,33 @@
+[
+  {
+    "id": "miage",
+    "institution": "Université Côte d'Azur",
+    "institution_full_name": null,
+    "start_year": 2026,
+    "end_year": null,
+    "is_current": true,
+    "academic_years": []
+  },
+  {
+    "id": "iai",
+    "institution": "IAI Cameroun",
+    "institution_full_name": "Institut Africain d'Informatique – Représentation du Cameroun",
+    "start_year": 2023,
+    "end_year": 2026,
+    "is_current": false,
+    "academic_years": [
+      {
+        "start_year": 2023,
+        "end_year": 2024
+      },
+      {
+        "start_year": 2024,
+        "end_year": 2025
+      },
+      {
+        "start_year": 2025,
+        "end_year": 2026
+      }
+    ]
+  }
+]

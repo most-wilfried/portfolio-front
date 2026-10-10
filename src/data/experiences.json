@@ -1,11 +1,12 @@
 [
   {
     "id": 1,
-    "company": "Crème Solutions",
+    "company": "CREM SOLUTION",
     "position": "Stage académique",
     "location": "",
     "start_date": "2025-07-01",
     "end_date": "2025-09-30",
-    "description": "Participation au développement et à la maintenance de modules applicatifs internes, analyse et correction de bugs sur des projets en production, découverte du travail en équipe et des bonnes pratiques professionnelles."
+    "description": "Participation au développement et à la maintenance de modules applicatifs internes, analyse et correction de bugs sur des projets en production, découverte du travail en équipe et des bonnes pratiques professionnelles.",
+    "context": "Stage académique réalisé dans le cadre de mon parcours en Génie Logiciel, avec des activités liées au développement logiciel et à l’Internet des objets (IoT)."
   }
 ]

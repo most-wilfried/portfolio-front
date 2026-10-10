@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import fr from './locales/fr.json';
 import en from './locales/en.json';
+import { getLocalizedPortfolio } from './data/localizedPortfolio';
 
 const dictionaries = { fr, en };
 const LanguageContext = createContext(null);
@@ -17,6 +18,8 @@ export function LanguageProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('portfolio_language', language);
     document.documentElement.setAttribute('lang', language);
+    document.title = dictionaries[language]['seo.title'];
+    document.querySelector('meta[name="description"]')?.setAttribute('content', dictionaries[language]['seo.description']);
   }, [language]);
 
   const value = useMemo(() => {
@@ -31,6 +34,7 @@ export function LanguageProvider({ children }) {
 
     return {
       language,
+      content: getLocalizedPortfolio(language),
       setLanguage,
       toggleLanguage: () => setLanguage((current) => (current === 'fr' ? 'en' : 'fr')),
       t,

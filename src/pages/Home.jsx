@@ -2,7 +2,6 @@ import { useMotionPreference } from '../hooks/useMotionPreference';
 import { useEffect, useRef, useState } from 'react';
 import {
   FaArrowRight,
-  FaArrowUp,
   FaChevronLeft,
   FaChevronRight,
   FaDownload,
@@ -16,20 +15,12 @@ import {
 import { motion as Motion } from 'framer-motion';
 import { getTechIcon } from '../constants/iconMap';
 import { useTranslation } from '../i18n';
-import { profile, skills, projects, experiences, certifications } from '../data/portfolio';
 import FloatingActions from '../components/FloatingActions';
 import Hero from '../components/Hero';
+import SkillDomains from '../components/SkillDomains';
+import PhoneContacts from '../components/PhoneContacts';
+import BackgroundTimeline from '../components/BackgroundTimeline';
 import { MotionSection, RevealHeading, RevealCard, InteractiveProject } from '../components/MotionPrimitives';
-
-const skillSections = [
-  'Frontend',
-  'Backend',
-  'Frameworks',
-  'Mobile',
-  'IoT / Électronique',
-  'Base de données',
-  'Outils',
-];
 
 const footerLinks = [
   { href: '#home', key: 'nav.home' },
@@ -39,24 +30,6 @@ const footerLinks = [
   { href: '#experience', key: 'nav.experience' },
   { href: '#contact', key: 'nav.contact' },
 ];
-
-function percentageFromSkill(skill) {
-  if (Number.isFinite(Number(skill.percentage))) {
-    return Math.max(0, Math.min(100, Number(skill.percentage)));
-  }
-
-  const level = String(skill.level || '').toLowerCase();
-
-  if (level.includes('avanc')) {
-    return 85;
-  }
-
-  if (level.includes('inter')) {
-    return 65;
-  }
-
-  return 40;
-}
 
 function projectPreviewStyle(project) {
   const title = project.title || 'Project';
@@ -80,27 +53,20 @@ function projectStatusLabel(status, t) {
   return knownStatuses.includes(status) ? t(`status.${status}`) : status;
 }
 
-const skillsByCategory = skillSections.map((category) => ({
-  label: category,
-  items: skills.filter((skill) => skill.category === category),
-}));
-
-const sortedProjects = [...projects].sort((a, b) => {
-  const yearDiff = Number(b.year || 0) - Number(a.year || 0);
-  return yearDiff || new Date(b.created_at || 0) - new Date(a.created_at || 0);
-});
-
 export default function Home() {
-  const { language, t } = useTranslation();
+  const { language, t, content: { profile, projects, certifications } } = useTranslation();
+  const sortedProjects = [...projects].sort((a, b) => Number(b.year || 0) - Number(a.year || 0) || new Date(b.created_at || 0) - new Date(a.created_at || 0));
   const reduced = useMotionPreference();
   const [contact, setContact] = useState({ name: '', email: '', subject: '', message: '' });
   const [status, setStatus] = useState(null);
-  const [galleryProject, setGalleryProject] = useState(null);
+  const [validation, setValidation] = useState({});
+  const [galleryState, setGalleryState] = useState(null);
+  const galleryProject = galleryState ? { ...projects.find((project) => project.id === galleryState.id), galleryImages: galleryState.images } : null;
   const [galleryIndex, setGalleryIndex] = useState(0);
   const galleryPanel = useRef(null);
 
   useEffect(() => {
-    if (!galleryProject) {
+    if (!galleryState) {
       return undefined;
     }
 
@@ -120,16 +86,16 @@ export default function Home() {
         }
       }
       if (event.key === 'Escape') {
-        setGalleryProject(null);
+        setGalleryState(null);
         setGalleryIndex(0);
       }
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
-        setGalleryIndex((index) => (index - 1 + galleryProject.galleryImages.length) % galleryProject.galleryImages.length);
+        setGalleryIndex((index) => (index - 1 + galleryState.images.length) % galleryState.images.length);
       }
       if (event.key === 'ArrowRight') {
         event.preventDefault();
-        setGalleryIndex((index) => (index + 1) % galleryProject.galleryImages.length);
+        setGalleryIndex((index) => (index + 1) % galleryState.images.length);
       }
     };
 
@@ -140,17 +106,36 @@ export default function Home() {
       window.removeEventListener('keydown', handleGalleryKeys);
       if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus({ preventScroll: true });
     };
-  }, [galleryProject]);
+  }, [galleryState]);
 
   const handleContactSubmit = (event) => {
     event.preventDefault();
-    if (!profile.email) {
-      setStatus(t('contact.unavailable'));
+    const errors = {};
+    for (const name of ['name', 'email', 'subject', 'message']) {
+      if (!contact[name].trim()) errors[name] = 'contact.validation.required';
+    }
+    if (contact.email.trim() && event.currentTarget.elements.email.validity.typeMismatch) {
+      errors.email = 'contact.validation.email';
+    }
+    setValidation(errors);
+    setStatus(null);
+    if (Object.keys(errors).length) {
+      event.currentTarget.elements[Object.keys(errors)[0]].focus();
       return;
     }
-    const body = `${contact.message}\n\n${contact.name}\n${contact.email}`;
-    window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(contact.subject)}&body=${encodeURIComponent(body)}`;
-    setStatus(t('contact.draftOpened'));
+    if (!profile.email) {
+      setStatus('contact.unavailable');
+      return;
+    }
+    const body = `${contact.message.trim()}\n\n${t('contact.name')}: ${contact.name.trim()}\n${t('contact.email')}: ${contact.email.trim()}\n\n${t('contact.signature')}`;
+    window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(contact.subject.trim())}&body=${encodeURIComponent(body)}`;
+    setStatus('contact.draftOpened');
+  };
+
+  const updateContact = (name, value) => {
+    setContact((current) => ({ ...current, [name]: value }));
+    setValidation((current) => ({ ...current, [name]: null }));
+    setStatus(null);
   };
 
   const renderTechTags = (technologies) => {
@@ -171,12 +156,12 @@ export default function Home() {
   };
 
   const openGallery = (project, galleryImages) => {
-    setGalleryProject({ ...project, galleryImages });
+    setGalleryState({ id: project.id, images: galleryImages });
     setGalleryIndex(0);
   };
 
   const closeGallery = () => {
-    setGalleryProject(null);
+    setGalleryState(null);
     setGalleryIndex(0);
   };
 
@@ -204,11 +189,6 @@ export default function Home() {
     window.history.replaceState(null, '', href);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: reduced ? 'instant' : 'smooth' });
-    window.history.replaceState(null, '', '#home');
-  };
-
   const normalizedWhatsApp = profile.whatsapp_number ? String(profile.whatsapp_number).replace(/\D/g, '') : '';
   const whatsappUrl = normalizedWhatsApp ? `https://wa.me/${normalizedWhatsApp}` : null;
   const emailUrl = profile.email ? `mailto:${profile.email}` : null;
@@ -220,9 +200,8 @@ export default function Home() {
       <MotionSection id="about" number="01">
         <div className="section-content">
           <RevealHeading>{t('about.title')}</RevealHeading>
-          <p>
-            {profile.about_intro}
-          </p>
+          <p className="current-study"><span>{t('about.currentStudy')}</span>{profile.current_study}</p>
+          <div className="about-narrative">{profile.about_paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
           <div className="about-grid">
             <article>
               <h3>{t('about.journey')}</h3>
@@ -250,53 +229,19 @@ export default function Home() {
               <p>{t('skills.description')}</p>
             </div>
           </div>
-          <div className="skill-grid">
-            {skillsByCategory.map(({ label, items }, index) => (
-              <RevealCard key={label} className="skill-category" index={index}>
-                <h3>{label}</h3>
-                {items.length > 0 ? (
-                  items.map((skill) => {
-                    const percent = percentageFromSkill(skill);
-                    return (
-                    <Motion.div key={skill.id} className="skill-card" whileHover={reduced ? undefined : { x: 3 }}>
-                      <span className="skill-icon">{getTechIcon(skill.icon || skill.name)}</span>
-                      <div className="skill-details">
-                        <div className="skill-card-header">
-                          <strong>{skill.name}</strong>
-                          <span>{percent}%</span>
-                        </div>
-                        <Motion.div className="skill-progress" role="progressbar"
-                          aria-label={skill.name} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}
-                          initial={reduced ? false : 'hidden'} whileInView="visible"
-                          viewport={{ once: false, amount: 0.65 }}
-                        >
-                          <Motion.span
-                            style={{ width: `${percent}%`, transformOrigin: 'left' }}
-                            variants={{ hidden: { scaleX: 0 }, visible: { scaleX: 1 } }}
-                            transition={{ duration: reduced ? 0 : 0.95, ease: [0.22, 1, 0.36, 1] }}
-                          />
-                        </Motion.div>
-                      </div>
-                    </Motion.div>
-                    );
-                  })
-                ) : (
-                  <p className="empty-state">{t('skills.empty')}</p>
-                )}
-              </RevealCard>
-            ))}
-          </div>
+          <SkillDomains />
         </div>
       </MotionSection>
 
       <MotionSection id="projects" number="03">
         <div className="section-header">
           <RevealHeading>{t('projects.title')}</RevealHeading>
+          <p>{t('projects.description')}</p>
         </div>
         <div className="project-grid">
           {sortedProjects.length > 0 ? (
             sortedProjects.map((project, index) => {
-              const projectType = project.project_type || project.category || 'personnel';
+              const projectType = project.project_type || 'personnel';
               const statusLabel = project.status;
               const galleryImages = [
                 project.image_url ? { id: 'main', url: project.image_url } : null,
@@ -323,7 +268,14 @@ export default function Home() {
                     </div>
                     <h3>{project.title}</h3>
                     <p>{project.description}</p>
+                    <div className="project-method">
+                      <dl>
+                        {['problem', 'needs', 'design'].map((field) => project[field] ? <div key={field}><dt>{t(`projects.${field}`)}</dt><dd>{project[field]}</dd></div> : null)}
+                      </dl>
+                      {project.features?.length ? <div><h4>{t('projects.features')}</h4><ul>{project.features.map((feature) => <li key={feature}>{feature}</li>)}</ul></div> : null}
+                    </div>
                     {renderTechTags(project.technologies)}
+                    {project.progress_note ? <p className="project-progress"><strong>{t('projects.progress')}</strong>{project.progress_note}</p> : null}
                     <div className="card-actions">
                       {project.github_url ? (
                         <a href={project.github_url} target="_blank" rel="noreferrer">
@@ -379,7 +331,7 @@ export default function Home() {
               >
                 <img
                   src={galleryProject.galleryImages[galleryIndex]?.url}
-                  alt={`${galleryProject.title} ${galleryIndex + 1}`}
+                  alt={t('gallery.imageAlt', { name: galleryProject.title, number: galleryIndex + 1 })}
                 />
               </a>
               <button type="button" className="gallery-arrow" onClick={showNextImage} aria-label={t('gallery.next')}>
@@ -393,14 +345,14 @@ export default function Home() {
                   key={image.id || image.url}
                   className={index === galleryIndex ? 'active' : ''}
                   onClick={() => setGalleryIndex(index)}
-                  aria-label={`${galleryProject.title} ${index + 1}`}
+                  aria-label={t('gallery.imageButton', { name: galleryProject.title, number: index + 1 })}
                 >
                   <img src={image.url} alt="" />
                 </button>
               ))}
             </div>
             <p className="gallery-counter">
-              {galleryIndex + 1} / {galleryProject.galleryImages.length}
+              {t('gallery.counter', { number: galleryIndex + 1, total: galleryProject.galleryImages.length })}
             </p>
           </Motion.div>
         </div>
@@ -411,26 +363,7 @@ export default function Home() {
           <RevealHeading>{t('experience.title')}</RevealHeading>
           <p>{t('experience.description')}</p>
         </div>
-        <div className="timeline">
-          {experiences.length > 0 ? (
-            experiences.map((experience, index) => (
-              <RevealCard key={experience.id} className="timeline-item" index={index}>
-                <span className="timeline-date">
-                  {new Date(experience.start_date).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', year: 'numeric' })}
-                  {' — '}
-                  {experience.end_date
-                    ? new Date(experience.end_date).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', year: 'numeric' })
-                    : t('experience.today')}
-                </span>
-                <h3>{experience.position}</h3>
-                <p className="muted">{experience.company} · {experience.location}</p>
-                <p>{experience.description}</p>
-              </RevealCard>
-            ))
-          ) : (
-            <p className="empty-state">{t('experience.empty')}</p>
-          )}
-        </div>
+        <BackgroundTimeline />
       </MotionSection>
 
       <MotionSection id="certifications" number="05">
@@ -472,51 +405,70 @@ export default function Home() {
           <aside className="contact-aside">
             <h3>{t('contact.asideTitle')}</h3>
             <p>{t('contact.asideText')}</p>
+            <h4>{t('contact.phone')}</h4>
+            <PhoneContacts />
             <div className="contact-links">
               {profile.email ? <a href={`mailto:${profile.email}`}><FaEnvelope /> {profile.email}</a> : null}
               {whatsappUrl ? <a href={whatsappUrl} target="_blank" rel="noreferrer"><FaWhatsapp /> WhatsApp</a> : null}
+              {profile.github_url ? <a href={profile.github_url} target="_blank" rel="noreferrer"><FaGithub /> GitHub</a> : null}
               {profile.linkedin_url ? <a href={profile.linkedin_url} target="_blank" rel="noreferrer"><FaLinkedin /> LinkedIn</a> : null}
             </div>
           </aside>
-          <form onSubmit={handleContactSubmit} className="contact-form">
+          <form onSubmit={handleContactSubmit} className="contact-form" noValidate>
             <p>{t('contact.mailHint')}</p>
             <div className="form-grid">
               <label>
                 {t('contact.name')}
                 <input
+                  name="name"
                   value={contact.name}
-                  onChange={(e) => setContact({ ...contact, name: e.target.value })}
+                  aria-invalid={!!validation.name}
+                  aria-describedby={validation.name ? 'error-name' : undefined}
+                  onChange={(e) => updateContact('name', e.target.value)}
                   required
                 />
+              {validation.name ? <span id="error-name" className="field-error">{t(validation.name)}</span> : null}
               </label>
               <label>
                 {t('contact.email')}
                 <input
                   type="email"
+                  name="email"
                   value={contact.email}
-                  onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                  aria-invalid={!!validation.email}
+                  aria-describedby={validation.email ? 'error-email' : undefined}
+                  onChange={(e) => updateContact('email', e.target.value)}
                   required
                 />
+              {validation.email ? <span id="error-email" className="field-error">{t(validation.email)}</span> : null}
               </label>
               <label className="full-width">
                 {t('contact.subject')}
                 <input
+                  name="subject"
                   value={contact.subject}
-                  onChange={(e) => setContact({ ...contact, subject: e.target.value })}
+                  aria-invalid={!!validation.subject}
+                  aria-describedby={validation.subject ? 'error-subject' : undefined}
+                  onChange={(e) => updateContact('subject', e.target.value)}
                   required
                 />
+              {validation.subject ? <span id="error-subject" className="field-error">{t(validation.subject)}</span> : null}
               </label>
               <label className="full-width">
                 {t('contact.message')}
                 <textarea
+                  name="message"
                   value={contact.message}
-                  onChange={(e) => setContact({ ...contact, message: e.target.value })}
+                  aria-invalid={!!validation.message}
+                  aria-describedby={validation.message ? 'error-message' : undefined}
+                  onChange={(e) => updateContact('message', e.target.value)}
                   required
                 />
+              {validation.message ? <span id="error-message" className="field-error">{t(validation.message)}</span> : null}
               </label>
             </div>
             <button type="submit" className="button button-primary">{t('contact.send')}</button>
-            {status ? <p className="form-status" role="status">{status}</p> : null}
+            {status ? <p className="form-status" role="status">{t(status)}</p> : null}
           </form>
         </div>
       </MotionSection>
@@ -529,10 +481,10 @@ export default function Home() {
             {profile.github_url ? <a href={profile.github_url} target="_blank" rel="noreferrer" aria-label="GitHub"><FaGithub /></a> : null}
             {profile.linkedin_url ? <a href={profile.linkedin_url} target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a> : null}
             {whatsappUrl ? <a href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="WhatsApp"><FaWhatsapp /></a> : null}
-            {emailUrl ? <a href={emailUrl} aria-label="Email"><FaEnvelope /></a> : null}
+            {emailUrl ? <a href={emailUrl} aria-label={t('hero.email')}><FaEnvelope /></a> : null}
           </div>
         </div>
-        <nav className="footer-nav" aria-label="Navigation de pied de page">
+        <nav className="footer-nav" aria-label={t('nav.footer')}>
           {footerLinks.map((link) => (
             <a key={link.key} href={link.href} onClick={(event) => handleFooterLink(event, link.href)}>
               {t(link.key)}
@@ -541,10 +493,7 @@ export default function Home() {
         </nav>
         <div className="footer-contact">
           {profile.email ? <a href={`mailto:${profile.email}`}>{profile.email}</a> : null}
-          
-          <button type="button" onClick={scrollToTop}>
-            <FaArrowUp /> {t('footer.backTop')}
-          </button>
+          <PhoneContacts variant="compact" />
         </div>
         <p className="footer-copy">
           © {new Date().getFullYear()} {t('brand')}. {t('footer.rights')}

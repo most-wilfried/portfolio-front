@@ -1,0 +1,161 @@
+{
+  "profile": {
+    "professional_title": "Analysis, Design & Development of Digital Solutions",
+    "professional_subtitle": "Master’s Student in MIAGE | IT Project Management Focus | AI & Digital Innovation",
+    "short_description": "I turn needs and ideas into practical digital solutions by combining requirements analysis, system modeling, software design, and emerging opportunities in artificial intelligence.",
+    "about_paragraphs": [
+      "I am passionate about digital technology and the design of software solutions, with a particular interest in requirements analysis, information systems modeling and bringing technology projects to life.",
+      "My background in software engineering, complemented by my Master’s studies in MIAGE, is helping me develop an approach that brings together technical skills, an understanding of business needs and project organization.",
+      "Beyond software development, I want to contribute throughout the IT project lifecycle, from identifying a problem to designing, implementing and improving the solution.",
+      "My ambition is to become an IT project manager while continuing to deepen my knowledge of artificial intelligence, automation and digital innovation."
+    ],
+    "journey": "Following three years of software engineering studies at IAI Cameroun (2023–2026), complemented by an academic internship at CREM SOLUTION, I began Master 1 MIAGE in the NUMRES track at Université Côte d'Azur in 2026. My web, application and IoT projects support this progression towards IT project analysis, design and organization.",
+    "goals": "Become an IT project manager and contribute to useful solutions by combining an understanding of business needs, information systems design, project coordination and responsible digital practices.",
+    "current_study": "Master 1 MIAGE, NUMRES track — Université Côte d'Azur · since 2026"
+  },
+  "skillGroups": [
+    {
+      "id": "analysis",
+      "title": "Information Systems Analysis & Design",
+      "description": "Understand a problem, document requirements and build models that guide the design of a solution.",
+      "practices": [
+        "Functional requirements analysis",
+        "Process modeling",
+        "Use case diagrams",
+        "Class diagrams",
+        "Conceptual and logical data models",
+        "Database design",
+        "Requirements documentation"
+      ],
+      "assessments": [
+        {
+          "name": "UML",
+          "percentage": 80
+        },
+        {
+          "name": "Merise",
+          "percentage": 50
+        }
+      ]
+    },
+    {
+      "id": "management",
+      "title": "IT Project Organization & Management",
+      "description": "Knowledge and practices for organizing work, tracking progress and collaborating around project requirements.",
+      "practices": [
+        "Task organization",
+        "Progress tracking",
+        "Foundations of agile methods",
+        "Planning",
+        "Requirements analysis",
+        "Documentation and formalization",
+        "Team collaboration"
+      ],
+      "assessments": [
+        {
+          "name": "Kanban",
+          "percentage": 52
+        }
+      ]
+    },
+    {
+      "id": "technical",
+      "title": "Digital Solution Design & Development",
+      "description": "Apply web, application and connected-device technologies to solutions that address practical needs.",
+      "practices": [
+        "Web interface design and development",
+        "Application development with Flutter",
+        "SQL database design",
+        "Integration of ESP32 devices and IoT systems",
+        "Version control and collaboration with Git"
+      ],
+      "assessments": []
+    },
+    {
+      "id": "ai",
+      "title": "Artificial Intelligence, LLMs & Automation",
+      "description": "An area I am exploring to understand AI applications, experiment with automation and consider how they can support digital solutions.",
+      "practices": [],
+      "assessments": [],
+      "learning": [
+        "Exploring large language models (LLMs)",
+        "Learning about and using generative AI tools",
+        "Discovering and experimenting with AI agents",
+        "Learning workflow automation with n8n",
+        "Exploring the integration of artificial intelligence APIs",
+        "Studying applications of intelligent systems"
+      ]
+    }
+  ],
+  "projects": {
+    "3": {
+      "title": "GameZone — Smart Video Game Venue Management",
+      "description": "Design of a management and monitoring system for a gaming venue, combining Flutter Desktop, SQLite and IoT devices powered by ESP32.",
+      "problem": "How can a gaming venue centralize management and make it easier to monitor stations, sessions and equipment?",
+      "needs": "Organize sessions, track payments and monitor equipment through a dedicated application.",
+      "design": "A Flutter Desktop application with local SQLite storage, connected to ESP32 devices to integrate IoT capabilities into venue management.",
+      "features": [
+        "Management of gaming stations and sessions",
+        "Payment tracking",
+        "Monitoring of connected equipment"
+      ],
+      "progress_note": "The scope above reflects the project description. Its exact progress and completed features still need to be documented."
+    },
+    "1": {
+      "title": "Intelligent Security System with ESP32",
+      "description": "An embedded system project exploring intrusion detection, connected devices and alert mechanisms with ESP32, a camera, sensors, Firebase and Flutter.",
+      "problem": "How can intrusion detection connect information from security devices to a monitoring interface?",
+      "needs": "Collect sensor information, use a camera and provide alert mechanisms to support security monitoring.",
+      "design": "An approach combining ESP32 and sensors for embedded devices, Firebase for data and Flutter for the application interface.",
+      "features": [
+        "Intrusion detection using connected devices",
+        "Collection of camera and sensor information",
+        "Alert mechanisms and a monitoring interface"
+      ],
+      "progress_note": "These elements describe the system’s scope. Its progress, testing and completed features still need to be confirmed."
+    },
+    "2": {
+      "title": "Travel Agency Management",
+      "description": "An academic project involving the analysis and design of a travel agency management system, collaboration through GitLab and the development of web interfaces.",
+      "problem": "How can a travel agency’s management requirements be structured and translated into a coherent system?",
+      "needs": "Document management requirements, design corresponding interfaces and organize project collaboration.",
+      "design": "An analysis and system design approach followed by web interface development and collaborative work through GitLab.",
+      "features": [
+        "Analysis and design of the management system",
+        "Development of web interfaces",
+        "Collaboration and code tracking through GitLab"
+      ],
+      "progress_note": "The available description confirms analysis, design and interface work. The detailed functional scope and final progress still need to be documented."
+    }
+  },
+  "experiences": {
+    "1": {
+      "position": "Academic Internship",
+      "description": "Contributed to the development and maintenance of internal application modules, investigated and fixed bugs in production projects, and gained experience in teamwork and professional practices.",
+      "context": "An academic internship undertaken as part of my software engineering studies, with activities involving software development and the Internet of Things (IoT)."
+    }
+  },
+  "certifications": {},
+  "educations": {
+    "miage": {
+      "title": "Master 1 MIAGE — NUMRES Track",
+      "description_paragraphs": [
+        "I began Master 1 MIAGE in the NUMRES track at Université Côte d'Azur in 2026. This current programme allows me to deepen my knowledge of information systems, IT project management, requirements analysis and responsible digital practices."
+      ],
+      "diplomas": []
+    },
+    "iai": {
+      "title": "Software Engineering",
+      "description_paragraphs": [
+        "During my three-year software engineering programme at IAI Cameroun, I developed skills in information systems analysis and design, software development, data modeling and the implementation of IT projects.",
+        "This programme strengthened my knowledge of programming, databases, UML and Merise design, and the organization and implementation of digital solutions.",
+        "Earning the Higher Technician Diploma, the Professional Bachelor’s Degree and the Diploma in Computer Engineering Technology marks an important stage in my academic journey and my progression towards careers in IT project design and management."
+      ],
+      "diplomas": [
+        "Higher Technician Diploma (DTS)",
+        "Professional Bachelor’s Degree in Software Engineering",
+        "Diploma in Computer Engineering Technology"
+      ]
+    }
+  }
+}

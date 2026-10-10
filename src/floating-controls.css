@@ -1,0 +1,142 @@
+.floating-actions.floating-controls {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  display: grid;
+  gap: 0.4rem;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.floating-controls-contact {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.floating-actions.floating-controls a,
+.floating-actions.floating-controls button {
+  display: grid;
+  place-items: center;
+  width: 2.85rem;
+  height: 2.85rem;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  border-radius: 1rem;
+  background: var(--surface-solid);
+  color: var(--accent);
+  font-size: 1.1rem;
+  box-shadow: 0 5px 18px rgb(0 0 0 / 12%);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.floating-actions.floating-controls .floating-back-top {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-3));
+  color: var(--surface-solid);
+  animation: floating-control-reveal 220ms ease both;
+}
+
+.floating-actions.floating-controls .floating-whatsapp {
+  border-color: color-mix(in srgb, #25d366 55%, var(--border));
+  background: color-mix(in srgb, var(--surface-solid) 90%, #25d366 10%);
+  color: #4ade80;
+  animation: floating-control-reveal 280ms ease both;
+}
+
+:root[data-theme='light'] .floating-actions.floating-controls .floating-whatsapp {
+  color: #128c45;
+}
+
+.floating-controls .floating-whatsapp svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.floating-controls svg {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.floating-actions.floating-controls a:focus-visible,
+.floating-actions.floating-controls button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* Dialogs own keyboard focus and visually cover the page's floating controls. */
+body.menu-nav-lock .floating-controls,
+body.nav-lock .floating-controls {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .floating-actions.floating-controls a:hover,
+  .floating-actions.floating-controls button:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .floating-actions.floating-controls .floating-whatsapp:hover {
+    border-color: #25d366;
+    box-shadow: 0 8px 24px rgb(37 211 102 / 18%);
+  }
+}
+
+/* On wide screens the dock sits outside the centered page. On narrower screens,
+   reserve its gutter throughout the page so text and interactive cards stay clear. */
+@media (max-width: 1300px) {
+  .page-shell > .section,
+  .page-shell > .hero-section {
+    padding-right: max(3rem, calc(2.85rem + env(safe-area-inset-right)));
+  }
+
+  .page-shell .portfolio-footer {
+    padding-right: 4.8rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .floating-actions.floating-controls {
+    right: max(0.65rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    gap: 0.35rem;
+  }
+
+  .floating-actions.floating-controls a,
+  .floating-actions.floating-controls button {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.9rem;
+  }
+}
+
+@keyframes floating-control-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-actions.floating-controls a,
+  .floating-actions.floating-controls button,
+  .floating-actions.floating-controls .floating-whatsapp,
+  .floating-actions.floating-controls .floating-back-top {
+    animation: none;
+    transition: none;
+  }
+
+  .floating-actions.floating-controls a:hover,
+  .floating-actions.floating-controls button:hover {
+    transform: none;
+  }
+}

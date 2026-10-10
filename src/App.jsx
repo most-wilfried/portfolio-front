@@ -35,8 +35,8 @@ function Navigation({ theme, onToggleTheme }) {
   const headerRef = useRef(null);
   const menuButtonRef = useRef(null);
   const panelRef = useRef(null);
-  const closeLabel = language === 'fr' ? 'Fermer le menu' : 'Close menu';
-  const navigationLabel = language === 'fr' ? 'Navigation principale' : 'Main navigation';
+  const closeLabel = t('nav.closeMenu');
+  const navigationLabel = t('nav.main');
 
   useEffect(() => {
     let frameId = null;
@@ -214,7 +214,7 @@ function Navigation({ theme, onToggleTheme }) {
             className="menu-toggle"
             type="button"
             onClick={() => setMenuOpen((value) => !value)}
-            aria-label={menuOpen ? closeLabel : language === 'fr' ? 'Ouvrir le menu' : 'Open menu'}
+            aria-label={menuOpen ? closeLabel : t('nav.openMenu')}
             aria-expanded={menuOpen}
             aria-controls={menuOpen ? 'mobile-navigation' : undefined}
           >

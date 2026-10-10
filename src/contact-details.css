@@ -1,0 +1,136 @@
+.phone-contacts {
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.phone-contacts li {
+  min-width: 0;
+}
+
+.phone-contacts .phone-contact-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--surface-soft);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.phone-contact-marker {
+  flex: 0 0 2rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  color: var(--accent);
+}
+
+.phone-contact-marker svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.phone-contact-marker > span {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.phone-contact-copy {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.phone-contact-country {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.phone-contact-number {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.phone-contacts .phone-contact-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.phone-contacts-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.2rem;
+}
+
+.phone-contacts-hero .phone-contact-link {
+  padding: 0.45rem 0.65rem;
+}
+
+.phone-contacts-hero .phone-contact-number,
+.phone-contacts-compact .phone-contact-number {
+  font-size: 0.82rem;
+}
+
+.phone-contacts-compact {
+  gap: 0.4rem;
+}
+
+.phone-contacts-compact .phone-contact-link {
+  padding: 0.2rem 0;
+  border-color: transparent;
+  background: transparent;
+  gap: 0.45rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .phone-contacts .phone-contact-link:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--surface-soft) 80%, var(--accent) 10%);
+  }
+}
+
+@media (max-width: 420px) {
+  .phone-contacts .phone-contact-link {
+    gap: 0.45rem;
+    padding: 0.45rem 0.55rem;
+  }
+
+  .phone-contact-marker {
+    flex-basis: 1.5rem;
+  }
+
+  .phone-contact-number {
+    font-size: 0.8rem;
+  }
+
+  .phone-contacts-hero {
+    display: grid;
+  }
+
+  .phone-contacts-hero .phone-contact-link {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .phone-contacts-compact .phone-contact-link {
+    padding: 0.2rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phone-contacts .phone-contact-link {
+    transition: none;
+  }
+}

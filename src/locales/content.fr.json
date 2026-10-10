@@ -1,0 +1,161 @@
+{
+  "profile": {
+    "professional_title": "Analyse, conception & réalisation de solutions numériques",
+    "professional_subtitle": "Étudiant en Master MIAGE | Orientation gestion de projets informatiques | IA & innovation numérique",
+    "short_description": "Je transforme les besoins et les idées en solutions numériques concrètes, en associant analyse, modélisation, conception logicielle et nouvelles possibilités offertes par l’intelligence artificielle.",
+    "about_paragraphs": [
+      "Passionné par les technologies numériques et la conception de solutions informatiques, je m’intéresse particulièrement à l’analyse des besoins, à la modélisation des systèmes d’information et à la réalisation de projets technologiques.",
+      "Mon parcours en Génie Logiciel, complété par ma formation en Master MIAGE, me permet de développer une approche associant compétences techniques, compréhension des besoins métiers et organisation des projets.",
+      "Au-delà du développement logiciel, je souhaite contribuer aux différentes étapes du cycle de vie d’un projet informatique, depuis l’identification d’une problématique jusqu’à la conception, la réalisation et l’amélioration de la solution.",
+      "Mon ambition est d’évoluer vers le métier de chef de projet informatique, tout en approfondissant mes connaissances en intelligence artificielle, automatisation et innovation numérique."
+    ],
+    "journey": "Mon parcours de trois années en Génie Logiciel à l’IAI Cameroun (2023–2026), enrichi d’un stage académique chez CREM SOLUTION, se poursuit depuis 2026 en Master 1 MIAGE, parcours NUMRES, à l’Université Côte d'Azur. Mes projets web, applicatifs et IoT nourrissent cette évolution vers l’analyse, la conception et l’organisation des projets informatiques.",
+    "goals": "Évoluer vers le métier de chef de projet informatique et contribuer à des solutions utiles, en associant compréhension des besoins métiers, conception des systèmes d’information, coordination des projets et numérique responsable.",
+    "current_study": "Master 1 MIAGE, parcours NUMRES — Université Côte d'Azur · depuis 2026"
+  },
+  "skillGroups": [
+    {
+      "id": "analysis",
+      "title": "Analyse & conception des systèmes d’information",
+      "description": "Comprendre une problématique, formaliser les besoins et construire des modèles pour guider la conception d’une solution.",
+      "practices": [
+        "Analyse des besoins fonctionnels",
+        "Modélisation des processus",
+        "Diagrammes de cas d’utilisation",
+        "Diagrammes de classes",
+        "Modèles conceptuels et logiques de données",
+        "Conception de bases de données",
+        "Documentation des exigences"
+      ],
+      "assessments": [
+        {
+          "name": "UML",
+          "percentage": 80
+        },
+        {
+          "name": "Merise",
+          "percentage": 50
+        }
+      ]
+    },
+    {
+      "id": "management",
+      "title": "Organisation & gestion de projets IT",
+      "description": "Des connaissances et pratiques pour structurer le travail, suivre les réalisations et collaborer autour des besoins d’un projet.",
+      "practices": [
+        "Organisation des tâches",
+        "Suivi des réalisations",
+        "Notions de méthodes agiles",
+        "Planification",
+        "Analyse des besoins",
+        "Formalisation et documentation",
+        "Collaboration en équipe"
+      ],
+      "assessments": [
+        {
+          "name": "Kanban",
+          "percentage": 52
+        }
+      ]
+    },
+    {
+      "id": "technical",
+      "title": "Conception & réalisation de solutions numériques",
+      "description": "Mobiliser les technologies du web, des applications et des objets connectés au service de solutions adaptées aux besoins.",
+      "practices": [
+        "Conception et développement d’interfaces web",
+        "Réalisation d’applications avec Flutter",
+        "Conception de bases de données SQL",
+        "Intégration d’équipements ESP32 et de systèmes IoT",
+        "Gestion de versions et collaboration avec Git"
+      ],
+      "assessments": []
+    },
+    {
+      "id": "ai",
+      "title": "Intelligence artificielle, LLM & automatisation",
+      "description": "Un domaine que j’explore pour comprendre les usages de l’IA, expérimenter l’automatisation et envisager leur intégration dans des solutions numériques.",
+      "practices": [],
+      "assessments": [],
+      "learning": [
+        "Exploration des grands modèles de langage (LLM)",
+        "Découverte et utilisation d’outils d’IA générative",
+        "Découverte et expérimentation des agents IA",
+        "Apprentissage de l’automatisation de workflows avec n8n",
+        "Exploration de l’intégration d’API d’intelligence artificielle",
+        "Étude des usages des systèmes intelligents"
+      ]
+    }
+  ],
+  "projects": {
+    "3": {
+      "title": "GameZone — Gestion intelligente d’une salle de jeux vidéo",
+      "description": "Conception d’un système de gestion et de supervision d’une salle de jeux associant Flutter Desktop, SQLite et des équipements IoT via ESP32.",
+      "problem": "Comment centraliser la gestion d’une salle de jeux et faciliter le suivi des postes, des sessions et des équipements ?",
+      "needs": "Organiser les sessions, suivre les paiements et superviser les équipements depuis une application dédiée.",
+      "design": "Une application Flutter Desktop avec stockage local SQLite, reliée à des équipements ESP32 pour intégrer la dimension IoT à la gestion de la salle.",
+      "features": [
+        "Gestion des postes et des sessions de jeu",
+        "Suivi des paiements",
+        "Supervision des équipements connectés"
+      ],
+      "progress_note": "Le périmètre ci-dessus reprend la description du projet. Le niveau précis d’avancement et les fonctionnalités finalisées restent à renseigner."
+    },
+    "1": {
+      "title": "Système de sécurité intelligent avec ESP32",
+      "description": "Projet de système embarqué autour de la détection d’intrusions, des équipements connectés et des mécanismes d’alerte, avec ESP32, caméra, capteurs, Firebase et Flutter.",
+      "problem": "Comment détecter une intrusion et relier les informations d’équipements de sécurité à une interface de suivi ?",
+      "needs": "Recueillir les informations des capteurs, exploiter une caméra et prévoir des mécanismes d’alerte pour le suivi de la sécurité.",
+      "design": "Une approche combinant ESP32 et capteurs pour les équipements embarqués, Firebase pour les données et Flutter pour l’interface applicative.",
+      "features": [
+        "Détection d’intrusions à partir d’équipements connectés",
+        "Collecte des informations de la caméra et des capteurs",
+        "Mécanismes d’alerte et interface de suivi"
+      ],
+      "progress_note": "Ces éléments décrivent le périmètre du système. Le niveau d’avancement, les essais et les fonctionnalités finalisées restent à préciser."
+    },
+    "2": {
+      "title": "Gestion d’une agence de voyage",
+      "description": "Projet académique d’analyse et de conception d’un système de gestion d’agence de voyage, avec collaboration via GitLab et réalisation d’interfaces web.",
+      "problem": "Comment structurer les besoins de gestion d’une agence de voyage et les traduire en un système cohérent ?",
+      "needs": "Formaliser les besoins de gestion, concevoir les interfaces correspondantes et organiser la collaboration autour du projet.",
+      "design": "Une démarche d’analyse et de conception du système, suivie de la réalisation d’interfaces web et d’un travail collaboratif avec GitLab.",
+      "features": [
+        "Analyse et conception du système de gestion",
+        "Réalisation d’interfaces web",
+        "Collaboration et suivi du code via GitLab"
+      ],
+      "progress_note": "La description disponible confirme le travail d’analyse, de conception et d’interfaces. Le périmètre fonctionnel détaillé et le niveau final d’avancement restent à renseigner."
+    }
+  },
+  "experiences": {
+    "1": {
+      "position": "Stage académique",
+      "description": "Participation au développement et à la maintenance de modules applicatifs internes, analyse et correction de bugs sur des projets en production, découverte du travail en équipe et des bonnes pratiques professionnelles.",
+      "context": "Stage académique réalisé dans le cadre de mon parcours en Génie Logiciel, avec des activités liées au développement logiciel et à l’Internet des objets (IoT)."
+    }
+  },
+  "certifications": {},
+  "educations": {
+    "miage": {
+      "title": "Master 1 MIAGE — parcours NUMRES",
+      "description_paragraphs": [
+        "Depuis 2026, je poursuis ma formation en Master 1 MIAGE, parcours NUMRES, à l’Université Côte d'Azur. Cette formation actuelle me permet d’approfondir mes compétences en systèmes d’information, en gestion de projets informatiques, en analyse des besoins et en numérique responsable."
+      ],
+      "diplomas": []
+    },
+    "iai": {
+      "title": "Génie Logiciel",
+      "description_paragraphs": [
+        "Durant mon parcours de trois années en Génie Logiciel à l’IAI Cameroun, j’ai développé des compétences en analyse et conception des systèmes d’information, en développement logiciel, en modélisation des données et en réalisation de projets informatiques.",
+        "Cette formation m’a permis de renforcer mes connaissances en programmation, en bases de données, en conception UML et Merise, ainsi qu’en organisation et mise en œuvre de solutions numériques.",
+        "L’obtention du Diplôme de Technicien Supérieur, de la Licence professionnelle et du Diplôme d’Ingénieur des Travaux Informatiques constitue une étape importante de mon parcours académique et de mon évolution vers les métiers de la conception et de la gestion de projets informatiques."
+      ],
+      "diplomas": [
+        "Diplôme de Technicien Supérieur (DTS)",
+        "Licence professionnelle en Génie Logiciel",
+        "Diplôme d’Ingénieur des Travaux Informatiques"
+      ]
+    }
+  }
+}
